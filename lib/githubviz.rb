@@ -6,67 +6,70 @@ require 'github-v3-api'
 
 
 MAX_LEVELS = 2
-@@level = 0
-
-@@data = {}
-@@result = {}
-
-@@api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
 
 def get_data
-  if @@level < MAX_LEVELS
+  if @level < MAX_LEVELS
     t = {}
-    @@data.each do |k,v|
-      if v['level'] == @@level
-        @@api.get("/users/#{k}/followers").each do |f|
-          unless @@data.has_key? f['login']
+    @data.each do |k,v|
+      if v['level'] == @level
+        @api.get("/users/#{k}/followers").each do |f|
+          unless @data.has_key? f['login']
             t[f['login']] = f
-            t[f['login']]['level'] = @@level+1
+            t[f['login']]['level'] = @level+1
             t[f['login']]['follower_count'] = 0
-            t[f['login']]['followers'] = @@api.get("/users/#{f['login']}/followers")
+            t[f['login']]['followers'] = @api.get("/users/#{f['login']}/followers")
           end
         end
       end
     end
-    @@data.merge! t
-    @@level += 1
+    @data.merge! t
+    @level += 1
     get_data
   end
 end
 
 def process_data
-  @@result['nodes'] = @@data.keys
-  @@result['links'] = []
+  @result['nodes'] = @data.keys
+  @result['links'] = []
 
-  @@data.each do |k,v|
+  @data.each do |k,v|
     v['followers'].each do |f|
-      @@result['links'] << {
-        "source" => @@result['nodes'].index(k),
-        "target" => @@result['nodes'].index(f['login']),
+      @result['links'] << {
+        "source" => @result['nodes'].index(k),
+        "target" => @result['nodes'].index(f['login']),
         "value" => 1
-      } if @@result['nodes'].index(f['login'])
+      } if @result['nodes'].index(f['login'])
     end
   end
 
-  @@result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @@data[n]['avatar_url'], "follower_count" => @@data[n]['follower_count']}}
+  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "follower_count" => @data[n]['follower_count']}}
 end
 
 get '/' do
-  @result = @@result
+  @result = {}
   erb :index
 end
 
 post '/' do
+  @level = 0
+
+  @data = {}
+
+  @result = {}
+
   @user = params[:user]
   if @user
-    @@data[@user] = @@api.get("/users/#{@user}")
-    @@data[@user]['level'] = 0
-    @@data[@user]['follower_count'] = @@data[@user]['followers']
-    @@data[@user]['followers'] = @@api.get("/users/#{@user}/followers")
+
+
+    @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+
+    @data[@user] = @api.get("/users/#{@user}")
+    @data[@user]['level'] = 0
+    @data[@user]['follower_count'] = @data[@user]['followers']
+    @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
     get_data
     process_data
   end
-  @result = @@result
   erb :index
 end
 
