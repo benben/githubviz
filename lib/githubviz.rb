@@ -106,7 +106,7 @@ __END__
     </form>
     </div>
     </div>
-    <% if true #@@result.length > 0 %>
+    <% if @@result.length > 0 %>
     <div style="clear:left;">
       <div class='gallery' id='chart'> </div>
     </div>
