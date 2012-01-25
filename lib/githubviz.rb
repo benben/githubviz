@@ -7,6 +7,8 @@ require 'github-v3-api'
 
 MAX_LEVELS = 2
 
+set :public_directory, Proc.new { File.join(root, "public") }
+
 def get_data
   if @level < MAX_LEVELS
     t = {}
