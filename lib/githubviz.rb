@@ -4,8 +4,6 @@ require 'rubygems'
 require 'sinatra'
 require 'github-v3-api'
 
-
-
 class GithubViz < Sinatra::Base
 
 set :public_directory, Proc.new { File.join(root, "public") }
@@ -33,11 +31,6 @@ def get_data
 end
 
 def process_data
-  #start = 1
-  #level1 = @data[@user]['follower_count']
-  
-  #while 
-  
   @result['nodes'] = @data.keys
   @result['links'] = []
 
@@ -70,8 +63,8 @@ post '/' do
   @MAX_LEVELS = params[:level].to_i
 
   @user = params[:user]
+  
   if @user
-
 
     @api = GitHubV3API.new('')
 
