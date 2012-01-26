@@ -17,23 +17,90 @@
       * {
         margin:0px;
         padding: 0px;
+        font-family: Arial;
       }
+      
+      h3 {
+       padding-bottom: 5px;
+      }
+      
+      p {
+      	font-size: 10pt;
+      }
+      
+      #header{
+      	padding:10px;
+      }
+      
+      .description {
+      	text-align:center;
+      	clear:both;
+      }
+      
+      .formlabel {
+      	font-size: 10pt;
+      }
+      
+      #menu{
+      	float:left;
+      }
+      
+       #menu li{
+      	float:left;
+      	list-style-type: none;
+      	padding: 10px 0px 0px 10px;
+      }
+      
+      .level_buttons{
+      	float:right;
+      }
+      
+      .level_buttons form{
+      	float:left;
+      	padding: 0px 10px 0px 0px;
+      }
+      
     </style>
   </head>
   <body>
     <div id="header">
-    <div style="float:left;">
-    <h1>githubviz</h1>
-    </div>
-    <div style="padding-top:10px;">
-    <form action="/" method="post">
-      <label>Enter your username:</label>
-      <input name="user" type="text">
-      <input type="submit" value="Do it!">
-    </form>
-    </div>
+    	<div style="float:left;">
+    		<h1>githubviz</h1>
+    	</div>
+    	<% if @result.length > 0 %>
+    	<div id="menu"><ul><li>page 1</li><li>page 2</li><li>page 3</li></ul></div>
+    	<% end %>
+    	<div style="float:right;">
+    		<form action="/" method="post">
+      			<label class="formlabel">Enter your username:</label>
+      			<input name="user" type="text">
+      			<input type="submit" value="Do it!">
+      			<input type="hidden" name="level" value="2">
+    		</form>
+    	</div>
     </div>
     <% if @result.length > 0 %>
+    <div class="description">
+    	<div class='level_buttons'> 
+      		<form action="/#chart" method="post">
+      			<input name="user" type="hidden" value="<%= @user %>">
+      			<input type="submit" value="1 Level">
+      			<input type="hidden" name="level" value="1">
+      		</form>
+      		<form action="/#chart" method="post">
+      			<input name="user" type="hidden" value="<%= @user %>">
+      			<input type="submit" value="2 Level">
+      			<input type="hidden" name="level" value="2">
+      		</form>
+    	</div>
+    	<div style="float:right;padding-right:23%">
+    		<h3><%= @user%>'s network of followers</h3>
+    		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
+    		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
+    		In the 2nd level all direct followers of <%=@user%>'s followers are displayed.
+    		</p>
+    	</div>
+    </div>
     <div style="clear:left;">
       <div class='gallery' id='chart'> </div>
     </div>
@@ -79,8 +146,8 @@
               .enter().append("svg:image")
             .attr("xlink:href", function(d) { return d.img; })
             //.attr("class", "node")
-            .attr("width", "25px")
-            .attr("height", "25px")
+            .attr("width", "35px")
+            .attr("height", "35px")
             .attr("x", function(d) { return d.x-12.5; })
             .attr("y", function(d) { return d.y-12.5; })
             //.attr("r", 50)
@@ -105,5 +172,6 @@
 
     </script>
     <% end %>
+    
   </body>
 </html>

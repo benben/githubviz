@@ -5,7 +5,6 @@ require 'sinatra'
 require 'github-v3-api'
 
 
-MAX_LEVELS = 2
 
 class GithubViz < Sinatra::Base
 
@@ -13,7 +12,7 @@ set :public_directory, Proc.new { File.join(root, "public") }
 set :public_folder, File.dirname(__FILE__) + '/public'
 
 def get_data
-  if @level < MAX_LEVELS
+  if @level < @MAX_LEVELS
     t = {}
     @data.each do |k,v|
       if v['level'] == @level
@@ -34,6 +33,11 @@ def get_data
 end
 
 def process_data
+  #start = 1
+  #level1 = @data[@user]['follower_count']
+  
+  #while 
+  
   @result['nodes'] = @data.keys
   @result['links'] = []
 
@@ -50,6 +54,7 @@ def process_data
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "follower_count" => @data[n]['follower_count']}}
 end
 
+
 get '/' do
   @result = {}
   erb :index
@@ -62,11 +67,13 @@ post '/' do
 
   @result = {}
 
+  @MAX_LEVELS = params[:level].to_i
+
   @user = params[:user]
   if @user
 
 
-    @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+    @api = GitHubV3API.new('')
 
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
