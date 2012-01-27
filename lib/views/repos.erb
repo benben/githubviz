@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>githubviz</title>
+    <script type="text/javascript" src="d3.js?2.7.2"></script>
+    <style>
+      circle.node {
+        stroke: #fff;
+        stroke-width: 1.5px;
+      }
+
+      line.link {
+        stroke: #999;
+        stroke-opacity: .6;
+      }
+
+      * {
+        margin:0px;
+        padding: 0px;
+        font-family: Arial;
+      }
+      
+      h3 {
+       padding-bottom: 5px;
+      }
+      
+      p {
+      	font-size: 10pt;
+      }
+      
+      #header{
+      	padding:10px;
+      }
+      
+      .description {
+      	text-align:center;
+      	clear:both;
+      }
+      
+      .formlabel {
+      	font-size: 10pt;
+      }
+      
+      #menu{
+      	float:left;
+      }
+      
+       #menu li{
+      	float:left;
+      	list-style-type: none;
+      	padding: 10px 0px 0px 10px;
+      }
+      
+      .level_buttons{
+      	float:right;
+      }
+      
+      .level_buttons form{
+      	float:left;
+      	padding: 0px 10px 0px 0px;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div id="header">
+    	<div style="float:left;">
+    		<h1><a href="/">githubviz</a></h1>
+    	</div>
+    	<% if @result.length > 0 %>
+    	<div id="menu"><ul><li><a href="/#chart">page 1</a></li><li><a href="/repos">page 2</a></li><li>page 3</li></ul></div>
+    	<% end %>
+    	<div style="float:right;">
+    		<form action="/" method="post">
+      			<label class="formlabel">Enter your username:</label>
+      			<input name="user" type="text">
+      			<input type="submit" value="Do it!">
+      			<input type="hidden" name="level" value="2">
+    		</form>
+    	</div>
+    </div>
+   <p><%= @repos%></p>
+    
+  </body>
+</html>
