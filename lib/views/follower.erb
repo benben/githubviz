@@ -1,0 +1,110 @@
+<% if @result.length > 0 %>
+    <script type="text/javascript">
+      	$(function (){
+        	$('.level_form').submit(function(ev){
+          		ev.preventDefault();
+          		$.ajax({
+            			url: "/follower_viz",
+            			data: $(this).serialize(),
+            			dataType: "html",
+            			success: function(data) {
+              				$('#viz').html(data);
+            			}	
+         		});
+			
+         	}); 
+        });
+    </script>
+    <div id="viz">
+    <div class="description">
+    	<div class="level_buttons"> 
+      		<form class="level_form" action="/follower_viz" method="post">
+      			<input name="user" type="hidden" value="<%= @user %>">
+      			<input type="submit" value="1 Level">
+      			<input type="hidden" name="level" value="1">
+      		</form>
+      		<form class="level_form" action="/follower_viz" method="post">
+      			<input name="user" type="hidden" value="<%= @user %>">
+      			<input type="submit" value="2 Level">
+      			<input type="hidden" name="level" value="2">
+      		</form>
+    	</div>
+    	<div style="float:right;padding-right:23%">
+    		<h3><%= @user%>'s network of followers</h3>
+    		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
+    		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
+    		In the 2nd level all direct followers of <%=@user%>'s followers are displayed.
+    		</p>
+    	</div>
+    </div>
+    <div style="clear:left;">
+      <div class='gallery' id='chart'> </div>
+    </div>
+    <script src='d3.layout.js?2.7.2' type='text/javascript'></script>
+    <script src='d3.geom.js?2.7.2' type='text/javascript'> </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type='text/javascript'>
+    $(function (){
+
+      var w = $(window).width(),
+          h = $(window).height() - $("#header").height() -20,
+          fill = d3.scale.category20();
+
+      var vis = d3.select("#chart").append("svg")
+          .attr("width", w)
+          .attr("height", h);
+
+        var json = <%= @result.to_json %>;
+          
+        var force = d3.layout.force()
+            .charge(-500)
+            .linkDistance(275)
+            .gravity(0.8)
+            .linkStrength(0.2)
+            .nodes(json.nodes)
+            .links(json.links)
+            .size([w, h])
+            .start();
+
+        var link = vis.selectAll("line.link")
+            .data(json.links)
+            .enter().append("line")
+            .attr("class", "link")
+            .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+
+        var node = vis.selectAll("image.node")
+            .data(json.nodes)
+              .enter().append("svg:image")
+            .attr("xlink:href", function(d) { return d.img; })
+            //.attr("class", "node")
+            .attr("width", "35px")
+            .attr("height", "35px")
+            .attr("x", function(d) { return d.x-12.5; })
+            .attr("y", function(d) { return d.y-12.5; })
+            //.attr("r", 50)
+            //.style("fill", function(d) { return fill(d.follower_count); })
+            .call(force.drag);
+
+        node.append("title")
+            .text(function(d) { return d.name; });
+
+        force.on("tick", function() {
+          link.attr("x1", function(d) { return d.source.x; })
+              .attr("y1", function(d) { return d.source.y; })
+              .attr("x2", function(d) { return d.target.x; })
+              .attr("y2", function(d) { return d.target.y; });
+
+          node.attr("x", function(d) { return d.x-12.5; })
+          .attr("y", function(d) { return d.y-12.5; });
+        //});
+      });
+    });
+
+
+    </script>
+    <% end %>
+    </div>

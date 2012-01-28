@@ -3,16 +3,12 @@
 require 'rubygems'
 require 'sinatra'
 
-enable :sessions
-
 class GithubViz < Sinatra::Base
 
 require 'github-v3-api.rb'
 
 set :public_directory, Proc.new { File.join(root, "public") }
 set :public_folder, File.dirname(__FILE__) + '/public'
-
-
 
 def get_data
   if @level < @MAX_LEVELS
@@ -52,15 +48,38 @@ def process_data
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "follower_count" => @data[n]['follower_count']}}
 end
 
-
 get '/' do
-  @result = {}
   erb :index
 end
 
-get '/repos' do
-  @result = {}
-  @user = [params[:user]
+get '/follower_viz' do
+
+  @level = 0	
+
+  @data = {}
+
+  @result = {"1" => "1"}
+
+  @MAX_LEVELS = params[:level].to_i
+
+  @user = params[:user]
+  
+  if @user
+
+    @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+
+    @data[@user] = @api.get("/users/#{@user}")
+    @data[@user]['level'] = 0
+    @data[@user]['follower_count'] = @data[@user]['followers']
+    @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
+    get_data
+    process_data
+    end
+  erb :follower
+end
+
+get '/repo_viz' do
+  @user = params[:user]
   @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
   user_data = @api.users.get(@user)
   my_repos = @api.repos.list
@@ -77,8 +96,7 @@ get '/repos' do
   user_repos[page-1] = @api.repos.list_repos(@user, page)
   page = page - 1
   end
-  
-  
+    
   a = 0 
   b = 0 
   c = 0
@@ -87,6 +105,7 @@ get '/repos' do
   pr_closed = Array.new
   pulldata = Array.new  
   closed_pulldata = Array.new 
+  merge = ""
   
   user_repos.each do |page|
     page.each do |repo|
@@ -116,13 +135,17 @@ get '/repos' do
     closed_pull["closed_pr_repodata"].each do |closed_pullrequest|
        if closed_pullrequest["user"]["login"] == @user then
            c = c + 1
+           #if closed_pullrequest.merged_at.nil? then 
+            # merge = "" 
+           #else 
+            # merge = closed_pullrequest.merged_at 
+           #end
            closed_pulldata[c-1] = {"title" => closed_pullrequest.title, "state" => closed_pullrequest.state, "created_at" => closed_pullrequest.created_at, "updated_at" => closed_pullrequest.updated_at, "closed_at" => closed_pullrequest.closed_at, "reponame" => closed_pull["reponame"], "repoowner" => closed_pull["repoowner"], "sum_pulls" => closed_pull["closed_pr_repodata"].length} 
        else
            c = c    
        end
     end
   end
-  
   
   @pr_open = pr
   @number_of_forks = a
@@ -133,34 +156,22 @@ get '/repos' do
   @closed_pulldata = closed_pulldata
   @reponame = repo_name
   @repos = user_repos
- 
-  erb :repos
+  
+  @j = {}
+  
+  @j["repos"] = []
+  @repos.each do |page|
+    page.each do |repo|
+    @j["repos"] << {"name" => repo.name, "size" => repo.size}
+  end
+  end
+
+  erb :repo
 end
 
-
-post '/' do
-  @level = 0
-
-  @data = {}
-
-  @result = {}
-
-  @MAX_LEVELS = params[:level].to_i
-
+get '/commit_viz' do
   @user = params[:user]
-  
-  if @user
-
-    @api = GitHubV3API.new('')
-
-    @data[@user] = @api.get("/users/#{@user}")
-    @data[@user]['level'] = 0
-    @data[@user]['follower_count'] = @data[@user]['followers']
-    @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
-    get_data
-    process_data
-  end
-  erb :index
+  erb :commit
 end
 
 end

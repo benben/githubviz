@@ -1,0 +1,111 @@
+<div id="viz">
+    <div class="description">
+	<h1><%= @user %>'s Repo GROWTH</h1>
+    </div>
+   <div class="gallery">
+      	<h1>Listing Repos</h1>
+	<br/>
+	<table border="1" rules="groups" width="70%">
+	  <thead>
+	  <tr>
+	    <th class="table_text">Name</th>
+	    <th class="table_text">Fork</th>
+	    <th class="table_text">Forks</th>
+	    <th class="table_text">Pic</th>
+	    <th class="table_text">Owner</th>
+	    <th class="table_text">Size</th>
+	    <th class="table_text">Watchers</th>
+	    <th class="table_text">Language</th>
+	  </tr>
+	  </thead>
+	  <tbody>
+	<% @repos.each do |page|
+		page.each do |repo| %>
+	  <tr>
+	    <td><%= repo.name %></td>
+	    <td><%= repo.fork %></td>
+	    <td><%= repo.forks%></td>
+	    <td><img src="<%= repo.owner["avatar_url"]%>" alt="Tanzmaus"></td>
+	    <td><%= repo.owner["login"]%></td>
+	    <td><%= repo.size%></td>
+	    <td><%= repo.watchers%></td>
+	    <td><%= repo.language%></td>
+	  </tr>
+	<%  end 
+	   end %>
+	</tbody>
+	</table>
+	</br>
+	<h2>Forked Repositories</h2>
+	<% if @number_of_forks == 0 then %>
+	<p>Summe forked Repos: <%= @number_of_forks %>
+	<% else%>
+	<p>Summe forked Repos: <%= @number_of_forks %> (<%= @reponame[0][0]%> from <em><%= @reponame[0][1]%></em>, <%= @reponame[1][0]%> from <em><%= @reponame[1][1] %></em>, <%= @reponame[2][0]%> from <em><%= @reponame[2][1]%></em>, )</p>
+	<br />
+	<% end %>
+	<br />
+	<h2>Pull Requests FROM <%= @user%> TO other Users</h2>
+	<br/>
+	<h3>Summe Open PRs: <%= @number_of_pulls %></h3>
+	<p>Pull Request Data:</p>
+	<table border="1" rules="groups" width="100%">
+	  <thead>
+	  <tr>
+	    <th class="table_text">URL</th>
+	    <th class="table_text">State</th>
+	    <th class="table_text">RepoName</th>
+	    <th class="table_text">RepoOwner</th>
+	    <th class="table_text">SumPulls on this Repo</th>
+	  </tr>
+	  </thead>
+	  <tbody>
+	<% @pulldata.each do |pull| %>
+	  <tr>
+	    <td><%= pull["url"]%></td>
+	    <td><%= pull["state"]%></td>
+	    <td><%= pull["reponame"]%></td>
+	    <td><%= pull["repoowner"]%></td>
+	    <td><%= pull["sum_pulls"]%></td>
+	  </tr>
+	<% end %>
+	  </tbody>
+	</table>
+	<br /><br />
+	<h3>Summe Closed PRs: <%= @number_of_closed_pulls %></h3>
+	<p>Pull Request Data:</p>
+	<table border="1" rules="groups" width="100%">
+	  <thead>
+	  <tr>
+	    <th class="table_text">Title</th>
+	    <th class="table_text">State</th>
+	    <th class="table_text">created_at</th>
+	    <th class="table_text">updated_at</th>
+	    
+	    <th class="table_text">closed_at</th>
+	    <th class="table_text">RepoName</th>
+	    <th class="table_text">RepoOwner</th>
+	    <th class="table_text">SumPulls on this Repo</th>
+	  </tr>
+	  </thead>
+	  <tbody>
+	<% @closed_pulldata.each do |closed_pull| %>
+	  <tr>
+	    <td><%= closed_pull["title"]%></td>
+	    <td><%= closed_pull["state"]%></td>
+	    <td><%= closed_pull["created_at"]%></td>
+	    <td><%= closed_pull["updated_at"]%></td>
+	    
+	    <td><%= closed_pull["closed_at"]%></td>
+	    <td><%= closed_pull["reponame"]%></td>
+	    <td><%= closed_pull["repoowner"]%></td>
+	    <td><%= closed_pull["sum_pulls"]%></td>
+	  </tr>
+	<% end %>
+	 </tbody>
+	</table>
+	<br/><br/>
+	<h3>Summe All PRs: <%= @number_of_all_pulls %></h3>
+        
+   </div>  
+</div>   
+
