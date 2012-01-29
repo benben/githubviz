@@ -25,10 +25,13 @@
           });
 
           //show the link to the repo_viz (don't forget: we are still in the submit event!)
-	  $('#viz_network').append($("<strong>Follower</strong>"));
-          $('#viz_repos').append($("<strong>Growth</strong>"));
-	  $('#viz_commits').append($("<strong>Commit Activity</strong>"));
-          $('#menu').show();
+        $('#viz_network').empty();
+      	$('#viz_repos').empty();
+	  	$('#viz_commits').empty();
+	  	$('#viz_network').append($("<strong>Follower</strong>"));
+      	$('#viz_repos').append($("<strong>Growth</strong>"));
+	  	$('#viz_commits').append($("<strong>Commit Activity</strong>"));
+      	$('#menu').show();
           
         });
 
@@ -49,7 +52,7 @@
 
         });
 
-	$('#viz_repos').click(function(ev){
+		$('#viz_repos').click(function(ev){
           //this happens if we click our new shiny link with the submitted username in it
 
           //do you remember?! :)
@@ -65,7 +68,7 @@
           });
 
         });
-	$('#viz_commits').click(function(ev){
+		$('#viz_commits').click(function(ev){
           //this happens if we click our new shiny link with the submitted username in it
 
           //do you remember?! :)
@@ -81,7 +84,7 @@
           });
 
         });
-
+        
       });
     </script>
     <style>
@@ -143,6 +146,12 @@
       
       .table_text{text-align: left;
       }
+
+	  .mode{
+	  	clear: both;
+		font-size: 10pt;
+		padding: 5px 5px 0 0;
+	  }
 
     </style>
   </head>

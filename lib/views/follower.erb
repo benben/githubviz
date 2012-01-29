@@ -13,6 +13,30 @@
          		});
 			
          	}); 
+         	$('#circle_mode').click(function(ev){
+          		ev.preventDefault();
+		        $.ajax({
+		            url: "/circle_viz",
+		            data: "user="+$("#viz_form input:first").val(),
+		            dataType: "html",
+		            success: function(data) {
+		              $('#chart').html(data);
+		        	}
+          		});
+        	});
+        	$('#network_mode').click(function(ev){
+	          	ev.preventDefault();
+	          	
+			    $.ajax({
+			            url: "/follower_viz",
+			            data: $("#viz_form").serialize(),
+			            dataType: "html",
+			            success: function(data) {
+			              $('#viz').html(data);
+			        	}
+	          	});
+        	});
+
         });
     </script>
     <div id="viz">
@@ -28,8 +52,12 @@
       			<input type="submit" value="2 Level">
       			<input type="hidden" name="level" value="2">
       		</form>
+	      	<div class="mode">
+	    	<a href="#" id ="circle_mode" class="mode">Circle Mode</a>
+	    	<a href="#" id ="network_mode" class="mode">Network Mode</a>
+	    	</div>
     	</div>
-    	<div style="float:right;padding-right:23%">
+    	<div style="float:right;padding-right:20%">
     		<h3><%= @user%>'s network of followers</h3>
     		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
     		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
