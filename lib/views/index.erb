@@ -112,6 +112,14 @@
       	font-size: 10pt;
       }
       
+      .gallery{
+      	text-align: center;
+      }
+      
+      #desc_text{
+      	width:450px;
+      }
+      
       #header{
       	padding:10px;
       }
@@ -119,6 +127,7 @@
       .description {
       	text-align:center;
       	clear:both;
+      	height: 85px;
       }
       
       .formlabel {
@@ -152,6 +161,39 @@
 		font-size: 10pt;
 		padding: 5px 5px 0 0;
 	  }
+	  
+	  #chord {
+	  font-size: 8pt; 
+	  font-family: sans-serif;
+	  height: 700px;
+	  width: 700px;
+	  padding-left: 0px;
+	}
+	
+	path.chord {
+	  fill-opacity: .85;
+	  stroke-opacity: 1.0;
+	}
+	
+	path{
+	  fill-opacity: 1.0;
+	  stroke-opacity: 1.0;
+	}
+	
+	.clickarea{
+	width: 280px;
+	height: 280px;
+	margin: 210px 0 0 16%;
+	z-index: 1;
+	position: absolute;
+	cursor: pointer;
+	}
+	
+	svg {
+	clear: both;
+	position: absolute;
+	z-index: 0;
+	}
 
     </style>
   </head>

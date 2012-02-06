@@ -23,6 +23,9 @@
 		              $('#chart').html(data);
 		        	}
           		});
+          		$('#desc_text').empty();
+          		$('#desc_text').append($("<p>network of followers</p>"));
+      			$('#description').show();
         	});
         	$('#network_mode').click(function(ev){
 	          	ev.preventDefault();
@@ -40,6 +43,7 @@
         });
     </script>
     <div id="viz">
+    	<!--<%= @result%>-->
     <div class="description">
     	<div class="level_buttons"> 
       		<form class="level_form" action="/follower_viz" method="post">
@@ -57,7 +61,7 @@
 	    	<a href="#" id ="network_mode" class="mode">Network Mode</a>
 	    	</div>
     	</div>
-    	<div style="float:right;padding-right:20%">
+    	<div id ="desc_text" style="float:right;padding-right:18%">
     		<h3><%= @user%>'s network of followers</h3>
     		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
     		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
@@ -75,7 +79,7 @@
     $(function (){
 
       var w = $(window).width(),
-          h = $(window).height() - $("#header").height() -20,
+          h = $(window).height() - $("#header").height() -80,
           fill = d3.scale.category20();
 
       var vis = d3.select("#chart").append("svg")
