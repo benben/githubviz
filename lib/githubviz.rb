@@ -66,7 +66,7 @@ get '/follower_viz' do
   
   if @user
 
-    @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+    @api = GitHubV3API.new(ACCESSTOKEN)
 
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
@@ -80,7 +80,7 @@ end
 
 get '/repo_viz' do
   @user = params[:user]
-  @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+  @api = GitHubV3API.new(ACCESSTOKEN)
   user_data = @api.users.get(@user)
   my_repos = @api.repos.list
   page = 1
@@ -175,7 +175,7 @@ get '/commit_viz' do
 end
 
 get '/circle_viz' do
-  @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+  @api = GitHubV3API.new(ACCESSTOKEN)
   @user = params[:user]
   user_data = @api.users.get(@user)
   #@data[@user] = @api.get("/users/#{@user}")
