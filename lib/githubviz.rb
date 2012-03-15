@@ -6,6 +6,7 @@ require 'sinatra'
 class GithubViz < Sinatra::Base
 
 require 'github-v3-api.rb'
+require 'access_token.rb'
 
 set :public_directory, Proc.new { File.join(root, "public") }
 set :public_folder, File.dirname(__FILE__) + '/public'
@@ -65,8 +66,8 @@ get '/follower_viz' do
   @user = params[:user]
   
   if @user
-
-    @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+    @token = TOKEN.new
+    @api = GitHubV3API.new(@token.get_token)
 
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
@@ -80,7 +81,8 @@ end
 
 get '/repo_viz' do
   @user = params[:user]
-  @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+  @token = TOKEN.new
+  @api = GitHubV3API.new(@token.get_token)
   user_data = @api.users.get(@user)
   my_repos = @api.repos.list
   page = 1
@@ -175,7 +177,8 @@ get '/commit_viz' do
 end
 
 get '/circle_viz' do
-  @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+  @token = TOKEN.new
+  @api = GitHubV3API.new(@token.get_token)
   @user = params[:user]
   user_data = @api.users.get(@user)
   #@data[@user] = @api.get("/users/#{@user}")
