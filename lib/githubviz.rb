@@ -66,6 +66,7 @@ get '/follower_viz' do
   @user = params[:user]
   
   if @user
+
     @token = TOKEN.new
     @api = GitHubV3API.new(@token.get_token)
 
@@ -81,8 +82,10 @@ end
 
 get '/repo_viz' do
   @user = params[:user]
+
   @token = TOKEN.new
   @api = GitHubV3API.new(@token.get_token)
+
   user_data = @api.users.get(@user)
   my_repos = @api.repos.list
   page = 1
@@ -177,8 +180,10 @@ get '/commit_viz' do
 end
 
 get '/circle_viz' do
+
   @token = TOKEN.new
   @api = GitHubV3API.new(@token.get_token)
+
   @user = params[:user]
   user_data = @api.users.get(@user)
   #@data[@user] = @api.get("/users/#{@user}")
