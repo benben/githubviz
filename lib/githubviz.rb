@@ -66,7 +66,7 @@ post '/' do
   if @user
 
 
-    @api = GitHubV3API.new('c1616feca6aa3e63655dd92766a475c2227ed6a0')
+    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
 
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
