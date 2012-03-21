@@ -1,5 +1,5 @@
 <h1><%= @user %>'s CIRCLE Mode</h1>
-<div class="gallery" id ="chord"></div>
+
 <script type="text/javascript" src="d3.js?2.7.2"></script>
 <script src='d3.layout.js?2.7.2' type='text/javascript'></script>
 <script src='d3.geom.js?2.7.2' type='text/javascript'> </script>
@@ -13,7 +13,7 @@ var a = 0;
 var b = 0;
 var r1 = 700 / 2,
     r0 = r1 - 140;
-
+var w = $(window).width() - 20;
 var fill = d3.scale.category20();
 
 var chord = d3.layout.chord()
@@ -23,13 +23,14 @@ var arc = d3.svg.arc()
     .innerRadius(r0)
     .outerRadius(r0 + 20);
 
-var clickarea = d3.select("#chord").append("div")
+var clickarea = d3.select("#chart").append("div")
     .attr("class", "clickarea")
     .style("opacity", 0);
 
-var svg = d3.select("#chord").append("svg")
-    .attr("width", r1 * 2)
+var svg = d3.select("#chart").append("svg")
+    .attr("width", w)
     .attr("height", r1 * 2)
+    .attr("class", "chord")
     //.attr("transform", "translate(" + r1 + "," + r1 + ")")
     //.attr("height", 10)
   .append("g")

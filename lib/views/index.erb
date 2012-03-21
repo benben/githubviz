@@ -117,7 +117,7 @@
       }
       
       #desc_text{
-      	width:450px;
+      	width:500px;
       }
       
       #header{
@@ -161,12 +161,15 @@
 		font-size: 10pt;
 		padding: 5px 5px 0 0;
 	  }
-	  
-	  #chord {
+	  .show_hide{
+	  	float:right;
+		font-size: 10pt;
+		padding: 5px 5px 0 0;
+	  }
+	  .chord {
 	  font-size: 8pt; 
 	  font-family: sans-serif;
 	  height: 700px;
-	  width: 700px;
 	  padding-left: 0px;
 	}
 	
@@ -189,12 +192,17 @@
 	cursor: pointer;
 	}
 	
-	svg {
+	svg.chord {
 	clear: both;
 	position: absolute;
 	z-index: 0;
+	left:50%;
+	margin-left:-350px;
+	width: 700px;
 	}
-
+	
+	.nodetext {pointer-events: none; font: 10px sans-serif; }
+	
     </style>
   </head>
   <body>
@@ -207,7 +215,7 @@
       			<label class="formlabel">Enter your username:</label>
       			<input name="user" type="text">
       			<input type="submit" value="Do it!">
-      			<input type="hidden" name="level" value="2">
+      			<input type="hidden" name="level" value="1">
     		</form>
   	</div>
 	<div id="menu">

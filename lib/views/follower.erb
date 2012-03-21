@@ -24,9 +24,37 @@
 		        	}
           		});
           		$('#desc_text').empty();
-          		$('#desc_text').append($("<p>network of followers</p>"));
+          		$('#desc_text').append($("<p>network of alters followed by and following ego</p>"));
       			$('#description').show();
+      			$('form.level_form').hide();
+          		$('div.show_hide').hide();
         	});
+        	$('#showhide').toggle(
+        		function(ev){
+          	    ev.preventDefault();
+       			$('text.nodetext').hide('slow'); // Ausblenden
+       			$(this).attr('title', 'show user name');
+       			$(this).text('show user name');
+      			},
+        		function(ev){
+          		ev.preventDefault();
+          		$('text.nodetext').show('slow'); // Einblenden
+          		$(this).attr('title', 'hide user name');
+          		$(this).text('hide user name');
+          		}
+      			);
+		        /*$.ajax({
+		            url: "/follower_viz",
+		            data: $("#viz_form").serialize(),
+		            dataType: "html",
+		            success: function(data) {
+		              $('#viz').html(data);
+		        	}
+          		});*/
+          		//$('text.nodetext').hide("slow");
+          		//$('#desc_text').append($("<p>network of followers</p>"));
+      			//$('text.nodetext').show();
+        	//});
         	$('#network_mode').click(function(ev){
 	          	ev.preventDefault();
 	          	
@@ -43,7 +71,7 @@
         });
     </script>
     <div id="viz">
-    	<!--<%= @result%>-->
+    	
     <div class="description">
     	<div class="level_buttons"> 
       		<form class="level_form" action="/follower_viz" method="post">
@@ -60,13 +88,17 @@
 	    	<a href="#" id ="circle_mode" class="mode">Circle Mode</a>
 	    	<a href="#" id ="network_mode" class="mode">Network Mode</a>
 	    	</div>
+	    	<div class="show_hide">
+	    	<a href="#" id ="showhide" class="show_hide">hide user name</a>
+	    	</div>
     	</div>
     	<div id ="desc_text" style="float:right;padding-right:18%">
     		<h3><%= @user%>'s network of followers</h3>
     		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
     		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
-    		In the 2nd level all direct followers of <%=@user%>'s followers are displayed.
+    		In the 2nd level all direct followers of <%=@user%>'s followers are additionally displayed.
     		</p>
+    	
     	</div>
     </div>
     <div style="clear:left;">
@@ -78,62 +110,93 @@
     <script type='text/javascript'>
     $(function (){
 
-      var w = $(window).width(),
-          h = $(window).height() - $("#header").height() -80,
+      var w = $(window).width() - 20
+          h = $(window).height() - $("#header").height() -150
           fill = d3.scale.category20();
 
       var vis = d3.select("#chart").append("svg")
           .attr("width", w)
           .attr("height", h);
 
-        var json = <%= @result.to_json %>;
-          
-        var force = d3.layout.force()
-            .charge(-500)
-            .linkDistance(275)
-            .gravity(0.8)
-            .linkStrength(0.2)
+      var json = <%= @result.to_json %>; 
+      var force = d3.layout.force()
+            .charge(-200)
+            .linkDistance(30)
             .nodes(json.nodes)
             .links(json.links)
             .size([w, h])
             .start();
-
-        var link = vis.selectAll("line.link")
+			
+      var link = vis.selectAll("line.link")
             .data(json.links)
             .enter().append("line")
             .attr("class", "link")
             .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+            //.style("fill", "#555555")
+      		.style("stroke","#555555")
             .attr("x1", function(d) { return d.source.x; })
             .attr("y1", function(d) { return d.source.y; })
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; });
 
-        var node = vis.selectAll("image.node")
+      var node = vis.selectAll("g.node")
+        //var node = vis.selectAll("image.node")
             .data(json.nodes)
-              .enter().append("svg:image")
-            .attr("xlink:href", function(d) { return d.img; })
-            //.attr("class", "node")
-            .attr("width", "35px")
-            .attr("height", "35px")
-            .attr("x", function(d) { return d.x-12.5; })
-            .attr("y", function(d) { return d.y-12.5; })
-            //.attr("r", 50)
+              //.enter().append("svg:image")
+              //.enter().append("circle")
+               .enter().append("svg:g")
+            //.attr("xlink:href", function(d) { return d.img; })
+            //.attr("class", "nodeimage")
+            //.attr("width", "18px")
+            //.attr("height", "18px")
+            //.attr("x", function(d) { return d.x-12.5; })
+            //.attr("y", function(d) { return d.y-12.5; })
+            //.attr("r", 5);
             //.style("fill", function(d) { return fill(d.follower_count); })
             .call(force.drag);
+                
+       
+    /*node.append("svg:image")
+        .attr("class", "nodeimage")
+        .attr("xlink:href", function(d) { return d.img; })
+        .attr("x", "-9px")
+        .attr("y", "-9px")
+        .attr("width", "18px")
+        .attr("height", "18px");*/
+       
+     node.append("svg:a")
+        .attr('xlink:href', function(d) {return d.profilseite;})
+        .attr('xlink:show', "new");
+     d3.select("svg").selectAll("a").append("svg:image") 
+        .attr("class", "nodeimage")
+        .attr("xlink:href", function(d) { return d.img; })
+        .attr("x", "-9px")
+        .attr("y", "-9px")
+        .attr("width", "18px")
+        .attr("height", "18px");       
+            
+    node.append("svg:text")
+        .attr("class", "nodetext")
+        .attr("dx", 11)
+        .attr("dy", ".75em")
+        .text(function(d) { return d.name });
+    node.append("title")
+        .text(function(d) { return d.name;});
 
-        node.append("title")
-            .text(function(d) { return d.name; });
-
-        force.on("tick", function() {
-          link.attr("x1", function(d) { return d.source.x; })
+      
+    
+    force.on("tick", function() {
+         link.attr("x1", function(d) { return d.source.x; })
               .attr("y1", function(d) { return d.source.y; })
               .attr("x2", function(d) { return d.target.x; })
               .attr("y2", function(d) { return d.target.y; });
-
-          node.attr("x", function(d) { return d.x-12.5; })
-          .attr("y", function(d) { return d.y-12.5; });
-        //});
-      });
+		  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+          //node.attr("x", function(d) { return d.x-12.5; })
+          //.attr("y", function(d) { return d.y-12.5; });
+          //node.attr("cx", function(d) { return d.x; })
+          //.attr("cy", function(d) { return d.y; });
+        });
+      //});
     });
 
 

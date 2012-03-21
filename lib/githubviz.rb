@@ -22,6 +22,7 @@ def get_data
             t[f['login']]['level'] = @level+1
             t[f['login']]['follower_count'] = 0
             t[f['login']]['followers'] = @api.get("/users/#{f['login']}/followers")
+            t[f['login']]['user'] = @api.get("/users/#{f['login']}")
           end
         end
       end
@@ -46,7 +47,7 @@ def process_data
     end
   end
 
-  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "follower_count" => @data[n]['follower_count']}}
+  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url']}} #, "follower_count" => @data[n]['follower_count']
 end
 
 get '/' do
@@ -55,7 +56,7 @@ end
 
 get '/follower_viz' do
 
-  @level = 0	
+  @level = 0  
 
   @data = {}
 
@@ -74,6 +75,7 @@ get '/follower_viz' do
     @data[@user]['level'] = 0
     @data[@user]['follower_count'] = @data[@user]['followers']
     @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
+    @data[@user]['user'] = @api.get("/users/#{@user}")
     get_data
     process_data
     end
