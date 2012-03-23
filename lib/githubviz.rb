@@ -11,6 +11,42 @@ require 'access_token.rb'
 set :public_directory, Proc.new { File.join(root, "public") }
 set :public_folder, File.dirname(__FILE__) + '/public'
 
+def get_circle_data
+  if @level < 1
+  t = {}
+    @circle_data.each do |k, v|
+      if v['level'] == @level
+        @api.get("/users/#{k}/followers").each do |f|
+          unless @circle_data.has_key? f['login']
+            t[f['login']] = f
+            t[f['login']]['level'] = @level+1
+            t[f['login']]['follower_count'] = 0
+            t[f['login']]['followers'] = @api.get("/users/#{f['login']}/followers")
+            #t[f['login']]['user'] = @api.get("/users/#{f['login']}")
+          end
+        end
+      end
+    end
+   
+   @circle_data.merge! t
+   @level += 1
+   get_circle_data
+   end
+end  
+ 
+def process_circle_data
+   @test = {}
+   @test['data'] = {}
+   @circle_result = @data.keys
+   @data.each do |k,v|
+    @test['data'][@circle_result.index(k)]= []
+    v['followers'].each do |f|
+      @test['data'][@circle_result.index(k)]<<  f['login']
+    end
+   end
+   @circle_result.map! {|n|{"name" => n, "imports" => @test['data'][@circle_result.index(n)]}} 
+end
+
 def get_data
   if @level < @MAX_LEVELS
     t = {}
@@ -182,15 +218,22 @@ get '/commit_viz' do
 end
 
 get '/circle_viz' do
-
-  @token = TOKEN.new
-  @api = GitHubV3API.new(@token.get_token)
-
+  @level = 0 
+  @circle_result = {}
+  @data = {}
   @user = params[:user]
-  user_data = @api.users.get(@user)
-  #@data[@user] = @api.get("/users/#{@user}")
-  #@data[@user]['follower_count'] = @data[@user]['followers']
-  #@data[@user]['followers'] = @api.get("/users/#{@user}/followers")
+  @MAX_LEVELS = 1 
+if @user
+    @token = TOKEN.new
+    @api = GitHubV3API.new(@token.get_token)
+    @data[@user] = @api.get("/users/#{@user}")
+    @data[@user]['level'] = 0
+    @data[@user]['follower_count'] = @data[@user]['followers']
+    @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
+    @data[@user]['user'] = @api.get("/users/#{@user}")
+    get_data
+    process_circle_data
+    end  
   erb :circle
 end
 

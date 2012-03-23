@@ -1,5 +1,4 @@
 <h1><%= @user %>'s CIRCLE Mode</h1>
-
 <script type="text/javascript" src="d3.js?2.7.2"></script>
 <script src='d3.layout.js?2.7.2' type='text/javascript'></script>
 <script src='d3.geom.js?2.7.2' type='text/javascript'> </script>
@@ -38,8 +37,10 @@ var svg = d3.select("#chart").append("svg")
   
 d3.select("div.clickarea").on("click", fade2(1));
 
+var json = <%= @circle_result.to_json %>; 
 
-d3.json("flare-imports.json", function(imports) {
+//alert(json);
+//d3.json("flare-imports.json", function(imports) {
   var indexByName = {},
       nameByIndex = {},
       matrix = [],
@@ -51,7 +52,8 @@ d3.json("flare-imports.json", function(imports) {
   }
 
   // Compute a unique index for each package name.
-  imports.forEach(function(d) {
+  json.forEach(function(d) {
+  	//alert(d);
     d = name(d.name);
     if (!(d in indexByName)) {
       nameByIndex[n] = d;
@@ -60,7 +62,7 @@ d3.json("flare-imports.json", function(imports) {
   });
 
   // Construct a square matrix counting package imports.
-  imports.forEach(function(d) {
+  json.forEach(function(d) {
     var source = indexByName[name(d.name)],
         row = matrix[source];
     if (!row) {
@@ -103,7 +105,7 @@ d3.json("flare-imports.json", function(imports) {
       .attr("d", d3.svg.chord().radius(r0))
       .style("opacity", 0);
 
-});
+//});
 //show or hide chords of selected node by mouseover (depends on switching opacity on/ off in function fade2)
 function fade_mover(opacity) {
   return function(g, i) {
