@@ -11,29 +11,6 @@ require 'access_token.rb'
 set :public_directory, Proc.new { File.join(root, "public") }
 set :public_folder, File.dirname(__FILE__) + '/public'
 
-def get_circle_data
-  if @level < 1
-  t = {}
-    @circle_data.each do |k, v|
-      if v['level'] == @level
-        @api.get("/users/#{k}/followers").each do |f|
-          unless @circle_data.has_key? f['login']
-            t[f['login']] = f
-            t[f['login']]['level'] = @level+1
-            t[f['login']]['follower_count'] = 0
-            t[f['login']]['followers'] = @api.get("/users/#{f['login']}/followers")
-            #t[f['login']]['user'] = @api.get("/users/#{f['login']}")
-          end
-        end
-      end
-    end
-   
-   @circle_data.merge! t
-   @level += 1
-   get_circle_data
-   end
-end  
- 
 def process_circle_data
    @test = {}
    @test['data'] = {}
