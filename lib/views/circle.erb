@@ -71,16 +71,18 @@ var json = <%= @circle_result.to_json %>;
     }
     d.imports.forEach(function(d) { row[indexByName[name(d)]]++; });
   });
-
-  chord.matrix(matrix);
-
+  
+  var transposed_matrix = d3.transpose(matrix);
+  //alert(transposed_matrix);	 
+  chord.matrix(transposed_matrix);
+  	
   var node = svg.selectAll("g.group")
       .data(chord.groups)
     .enter().append("g")
 
   node.append("path")
-      .style("fill", "#666666")
-      .style("stroke","#666666")
+      .style("fill", "#BC4766")
+      .style("stroke","#BC4766")
       .attr("d", arc)
       .on("mouseover", fade_mover(0))
       .on("mouseout", fade_mout(1));
@@ -111,57 +113,82 @@ function fade_mover(opacity) {
   return function(g, i) {
     a = 0;
     b = 0;
+    c = 0;
     index = [];
     index2 = [];
+    test = [];
     svg.selectAll("path.chord")
         .filter(function(d) {
+	//if (d.source.index == i && d.target.index == i){	
+	//index[a] = [d.target.index];
+	//index2[b] = index[a];
+	//a += 1;	
+	//b += 1;
+	//}
 	if (d.source.index == i){
+	//if (d.target.index != i){
 	index[a] = [d.target.index];
-	a += 1;}
+	a += 1;	
+	//} else if (d.target.index == i){
+	//index2[b] = [d.target.index];
+	//b += 1;
+	//}
+	}	
 	if (d.target.index == i){
+		
+	//alert(d.source.index);
+	//b += 1;
 	index2[b] = [d.source.index];
-	b += 1;}
+	b += 1;
+	}
+	
+	console.log(index);
+
+
 	if (fader == false){
         	opacity = 1;
 		return d.source.index == i || d.target.index == i;
 		}
 	else if (fader == true) {
 		opacity = 0;
-		return d.source.index != i && d.target.index != i;}
+		return d.source.index != i && d.target.index != i;
+		}
         })
       .transition()
         .style("opacity", opacity)
 	.duration(400)
-
+//alert("index1: " + index + "index2: " + index2);	
     index.forEach(function(ind){
 	    svg.selectAll("path")
 		.filter(function(d) {
+			//alert ("ind: " + ind);
 		 return d.index == ind;	
 		index = [];
 		a = 0;
 	    })
 	      .transition()
-		.style("stroke", "#0d50f6")
-		.style("fill", "#0d50f6");
+		.style("stroke", "#124F62")
+		.style("fill", "#124F62");
      });
      index2.forEach(function(ind2){
 	    svg.selectAll("path")
 		.filter(function(d) {
+			//alert ("ind2: " + ind2);
 		 return d.index == ind2;	
 		index2 = [];
 		b = 0;
 	    })
 	      .transition()
-		.style("stroke", "#0cb0f6")
-		.style("fill", "#0cb0f6");
+		.style("stroke", "#3190AF")
+		.style("fill", "#3190AF");
      });
      svg.selectAll("path")
 		.filter(function(d) {
 			return d.index == i;	
 	    	})
 	      .transition()
-		.style("stroke", "#ff0442")
-		.style("fill", "#ff0442");
+		.style("stroke", "#FBEF3A")
+		.style("fill", "#FBEF3A");
   };
 };
 //show or hide chords of selected node by mouseout (depends on switching opacity on/ off in function fade2)
@@ -198,8 +225,8 @@ function fade_mout(opacity) {
 			a = 0;
 	   	 })
 	      .transition()
-		.style("stroke", "#666666")
-		.style("fill", "#666666");
+		.style("stroke", "#BC4766")
+		.style("fill", "#BC4766");
      });
 
      index2.forEach(function(ind2){
@@ -210,16 +237,16 @@ function fade_mout(opacity) {
 			b = 0;
 	    	})
 	      .transition()
-		.style("stroke", "#666666")
-		.style("fill", "#666666");
+		.style("stroke", "#BC4766")
+		.style("fill", "#BC4766");
      });
     svg.selectAll("path")
         .filter(function(d) {
 		return d.index == i;
 	 })
       .transition()
-	.style("stroke", "#666666")
-	.style("fill", "#666666");
+	.style("stroke", "#BC4766")
+	.style("fill", "#BC4766");
   };
 };
 //show or hide all chords by clicking the center of the circle

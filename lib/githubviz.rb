@@ -60,7 +60,7 @@ def process_data
     end
   end
 
-  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url']}} #, "follower_count" => @data[n]['follower_count']
+  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count']}}
 end
 
 get '/' do
