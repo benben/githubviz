@@ -85,14 +85,24 @@ get '/follower_viz' do
     @api = GitHubV3API.new(@token.get_token)
 
     @data[@user] = @api.get("/users/#{@user}")
+    
+   # if @data[@user]['message']
+      
+    #else
     @data[@user]['level'] = 0
     @data[@user]['follower_count'] = @data[@user]['followers']
     @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
     @data[@user]['user'] = @api.get("/users/#{@user}")
     get_data
     process_data
-    end
-  erb :follower
+  #if @result.length > 0 then
+    erb :follower
+  #else
+   # get '/not_registered' do
+    #  erb :not_registered
+    #end
+  #end
+  end
 end
 
 get '/repo_viz' do
