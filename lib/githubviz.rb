@@ -6,10 +6,10 @@ require 'sinatra'
 class GithubViz < Sinatra::Base
 
 require 'github-v3-api.rb'
-require 'access_token.rb'
 
 set :public_directory, Proc.new { File.join(root, "public") }
 set :public_folder, File.dirname(__FILE__) + '/public'
+#set :environment, 'GITHUB_API_KEY'
 
 def process_circle_data
    @test = {}
@@ -81,13 +81,12 @@ get '/follower_viz' do
   
   if @user
 
-    @token = TOKEN.new
-    @api = GitHubV3API.new(@token.get_token)
+    @token = ENV['GITHUB_API_KEY']
+    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
 
     @data[@user] = @api.get("/users/#{@user}")
     
    # if @data[@user]['message']
-      
     #else
     @data[@user]['level'] = 0
     @data[@user]['follower_count'] = @data[@user]['followers']
@@ -108,8 +107,9 @@ end
 get '/repo_viz' do
   @user = params[:user]
 
-  @token = TOKEN.new
-  @api = GitHubV3API.new(@token.get_token)
+  #@token = TOKEN.new
+  @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
+ 
 
   user_data = @api.users.get(@user)
   my_repos = @api.repos.list
@@ -211,8 +211,8 @@ get '/circle_viz' do
   @user = params[:user]
   @MAX_LEVELS = 1 
 if @user
-    @token = TOKEN.new
-    @api = GitHubV3API.new(@token.get_token)
+    #@token = TOKEN.new
+    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
     @data[@user]['follower_count'] = @data[@user]['followers']
