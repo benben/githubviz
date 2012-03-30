@@ -1,5 +1,6 @@
 <% if @result.length > 0 then%>
     <script type="text/javascript">
+    var showOrHide = true;
       	$(function (){
         	$('.level_form').submit(function(ev){
           		ev.preventDefault();
@@ -29,31 +30,20 @@
           		$('div.show_hide').hide();
         	});
         	$('#showhide').toggle(
-        		function(ev){
-          	    ev.preventDefault();
-       			$('text.nodetext').hide('slow'); // Ausblenden
-       			$(this).attr('title', 'show user name');
-       			$(this).text('show user name');
-      			},
-        		function(ev){
-          		ev.preventDefault();
-          		$('text.nodetext').show('slow'); // Einblenden
-          		$(this).attr('title', 'hide user name');
-          		$(this).text('hide user name');
-          		}
+        		function(){
+	   			//ev.prevent.Default();
+	   			$('text.nodetext').animate({opacity: 0}, "slow");
+	   			$(this).attr('title', 'show user name');
+           		$(this).text('show user name');
+	  			},
+	  			function(){
+	   			//ev.prevent.Default();
+	   			$('text.nodetext').animate({opacity: 1}, "slow");
+	   			$(this).attr('title', 'hide user name');
+           		$(this).text('hide user name');
+	  			}	
       			);
-		        /*$.ajax({
-		            url: "/follower_viz",
-		            data: $("#viz_form").serialize(),
-		            dataType: "html",
-		            success: function(data) {
-		              $('#viz').html(data);
-		        	}
-          		});*/
-          		//$('text.nodetext').hide("slow");
-          		//$('#desc_text').append($("<p>network of followers</p>"));
-      			//$('text.nodetext').show();
-        	//});
+		       
         	$('#network_mode').click(function(ev){
 	          	ev.preventDefault();
 	          	
@@ -85,9 +75,9 @@
 	    	<a href="#" id ="circle_mode" class="mode">Circle Mode</a>
 	    	<a href="#" id ="network_mode" class="mode">Network Mode</a>
 	    	</div>
-	    	<div class="show_hide">
-	    	<a href="#" id ="showhide" class="show_hide">hide user name</a>
-	    	</div>
+	    	
+	    	<button title="showOrHide" id ="showhide" class="show_hide">hide user name</button>
+	    	
     	</div>
     	<div id ="desc_text" style="float:right;padding-right:18%">
     		<h3><%= @user%>'s network of <%= @data.keys.length%> followers</h3>
