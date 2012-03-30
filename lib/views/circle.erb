@@ -187,12 +187,18 @@ function fade_mout(opacity) {
     index2 = [];
     svg.selectAll("path.chord")
         .filter(function(d) {
-		if (d.source.index == i){
+		if (d.source.index == i && d.target.value != d.source.value){
 			index[a] = [d.target.index];
-			a += 1;}
-		if (d.target.index == i){
+			a += 1;	
+		}	
+		else if (d.source.index == i && d.target.value == d.source.value){
+			index2[b] = [d.target.index];
+			b += 1;
+		}
+		else if (d.target.index == i){
 			index2[b] = [d.source.index];
-			b += 1;}
+			b += 1;
+		}
 		if (fader == false){
 			opacity = 0;
 			return d.source.index == i || d.target.index == i;}
