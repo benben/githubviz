@@ -95,8 +95,8 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
     <script type='text/javascript'>
     $(function (){
-      var w = $(window).width() - 20
-          h = $(window).height() - $("#header").height() -150
+      var w = $(document).width() - 20
+          h = $(document).height() - $("#header").height() -150
           fill = d3.scale.category20();
       var vis = d3.select("#chart").append("svg")
           .attr("width", w)
