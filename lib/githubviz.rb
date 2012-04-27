@@ -8,9 +8,10 @@ class GithubViz < Sinatra::Base
 
 require 'github-v3-api.rb'
 
-set :views, File.dirname(__FILE__) + '/views'
-set :public_directory, Proc.new { File.join(root, "public") }
-set :public_folder, File.dirname(__FILE__) + '/public'
+set :app_file, __FILE__
+#set :views, File.dirname(__FILE__) + '/views'
+#set :public_directory, Proc.new { File.join(root, "public") }
+#set :public_folder, File.dirname(__FILE__) + '/public'
 
 def process_circle_data
    @test = {}
