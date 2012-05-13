@@ -2,20 +2,40 @@
     <script type="text/javascript">
     var showOrHide = true;
       	$(function (){
+      		
         	$('.level_form').submit(function(ev){
           		ev.preventDefault();
           		$.ajax({
+          				beforeSend: function(){
+          					$('#chart').hide();
+          					$('#desc_text').hide();
+          					$('.ajaxBusy').show();
+          					
+          				},
+            			complete: function(){
+            				$('#chart').show();
+            				$('#desc_text').show();
+            				$('.ajaxBusy').hide();
+            			},	
             			url: "/follower_viz",
             			data: $(this).serialize(),
             			dataType: "html",
             			success: function(data) {
               				$('#viz').html(data);
-            			}	
+            			}
          		});
          	}); 
          	$('#circle_mode').click(function(ev){
           		ev.preventDefault();
 		        $.ajax({
+		        	beforeSend: function(){
+          				$('#chart').hide();
+          				$('.ajaxBusy').show();	
+          			},
+            		complete: function(){
+            			$('#chart').show();
+            			$('.ajaxBusy').hide();
+            		},	
 		            url: "/circle_viz",
 		            data: "user="+$("#viz_form input:first").val(),
 		            dataType: "html",
@@ -47,6 +67,17 @@
 	          	ev.preventDefault();
 	          	
 			    $.ajax({
+			    		beforeSend: function(){
+          					$('#chart').hide();
+          					$('#desc_text').hide();
+          					$('.ajaxBusy').show();
+          					
+          				},
+            			complete: function(){
+            				$('#chart').show();
+            				$('#desc_text').show();
+            				$('.ajaxBusy').hide();
+            			},
 			            url: "/follower_viz",
 			            data: $("#viz_form").serialize(),
 			            dataType: "html",
@@ -57,7 +88,7 @@
         	});
         });
     </script>
-    <div id="viz">
+    <div class="vis" id="viz">
     <div class="description">
     	<div class="level_buttons"> 
       		<form class="level_form" action="/follower_viz" method="post">
@@ -238,4 +269,8 @@
     </script>
        
     <%end %>
+    <div class="ajaxBusy">
+    	<p>Loading</p>
+    	<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
     </div>
+    </div> 

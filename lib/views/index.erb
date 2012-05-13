@@ -7,11 +7,20 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript">
       $(function (){
+      	
+      	// Ajax activity indicator bound to ajax send/complete
+	    $("#viz_form").bind("ajaxSend", function(){
+   			$(".ajaxBusy").show();
+ 	    }).bind("ajaxComplete", function(){
+   			$(".ajaxBusy").hide();
+ 	    });
+
+      	
+      	
         $('#viz_form').submit(function(ev){
           //this happens if form is submitted
           //prevent the default behavior of a form (it should do nothing in our case)
           ev.preventDefault();
-
           //send an ajax request to our action
           $.ajax({
             url: "/follower_viz",
@@ -19,6 +28,7 @@
             data: $(this).serialize(),
             //the type of data we are expecting back from server, could be json too
             dataType: "html",
+            //global:false,
             success: function(data) {
               //if our ajax request is successful, replace the content of our viz div with the response data
               $('#content').html(data);
@@ -82,6 +92,10 @@
       });
     </script>
     <style>
+      .ajaxBusy{
+    	display:none;
+    	text-align: center;
+      }
       circle.node {
         stroke: #fff;
         stroke-width: 1.5px;
@@ -222,13 +236,18 @@
       	</ul>
     	</div>
     </div>
-    <div id="content">    
-    <div id="viz">
+    <div id="content">  
+    <div class="vis">
     <div class="description">
 	<p>Please enter your user name! You're not registered? Please register a user name @ github!</p>
     </div>
     <div class="gallery">
     </div>
-	</div></div>
+	</div>
+	<div class="ajaxBusy">
+		<p>Loading</p>
+		<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
+	</div> 
+	</div>
   </body>
 </html>
