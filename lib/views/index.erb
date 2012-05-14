@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <title>githubviz</title>
     <script type="text/javascript" src="d3.js?2.7.2"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
     <script type="text/javascript">
       $(function (){
-      	
       	// Ajax activity indicator bound to ajax send/complete
 	    $("#viz_form").bind("ajaxSend", function(){
    			$(".ajaxBusy").show();
@@ -15,8 +14,6 @@
    			$(".ajaxBusy").hide();
  	    });
 
-      	
-      	
         $('#viz_form').submit(function(ev){
           //this happens if form is submitted
           //prevent the default behavior of a form (it should do nothing in our case)
@@ -32,9 +29,20 @@
             success: function(data) {
               //if our ajax request is successful, replace the content of our viz div with the response data
               $('#content').html(data);
+            },
+            error: function(jqXHR){
+            	if (jqXHR.status === 0) {
+            		$('.gallery').append('<p>Not connect. Verify Network.</p>');
+                	//alert('Not connect.\n Verify Network.');
+            	} else if (jqXHR.status == 404) {
+            		$('.gallery').append('<p>ERROR 404 (Requested page not found)</p>');
+                	//alert('Requested page not found. [404]');
+            	} else if (jqXHR.status == 500) {
+            		$('.gallery').append('<p>ERROR 500 (Internal Server Error) - Please enter a registered username!</p>');
+                	//alert('Internal Server Error [500].');
+                }
             }
           });
-
         $('#viz_network').empty();
       	$('#viz_repos').empty();
 	  	$('#viz_commits').empty();
@@ -42,7 +50,6 @@
       	$('#viz_repos').append($("<strong>RepositoryGrowth</strong>"));
 	  	$('#viz_commits').append($("<strong>Commit Activity</strong>"));
       	$('#menu').show();
-          
         });
 
         $('#viz_network').click(function(ev){
@@ -57,13 +64,12 @@
               $('#content').html(data);
             }
           });
-
         });
 
 		$('#viz_repos').click(function(ev){
-
+			
           ev.preventDefault();
-
+          
           $.ajax({
             url: "/repo_viz",
             data: "user="+$("#viz_form input:first").val(),
@@ -72,7 +78,6 @@
               $('#content').html(data);
             }
           });
-
         });
 		$('#viz_commits').click(function(ev){
 
@@ -86,9 +91,7 @@
               $('#content').html(data);
             }
           });
-
         });
-        
       });
     </script>
     <style>
@@ -100,70 +103,74 @@
         stroke: #fff;
         stroke-width: 1.5px;
       }
-
       line.link {
         stroke: #999;
         stroke-opacity: .6;
       }
-
       * {
         margin:0px;
         padding: 0px;
         font-family: Arial;
       }
-      
       h3 {
        padding-bottom: 5px;
       }
-      
-      p {
+      p, ul {
       	font-size: 10pt;
       }
-      
+      #advancedSettings li{
+      	list-style-type: none;
+      }
+      #advancedSettings ul{
+      	clear:left;
+      	text-align:left;
+      	margin: 5px 0px 0px 0px;
+      }
       .gallery{
       	text-align: center;
       }
-      
       #desc_text{
       	width:500px;
+      	margin-left:30.5%;
       }
-      
       #header{
       	padding:10px;
       }
-      
       .description {
       	text-align:center;
       	clear:both;
       	height: 85px;
       }
-      
       .formlabel {
       	font-size: 10pt;
       }
-      
       #menu{
       	float:left;
       }
-      
-       #menu li{
+      #menu li{
       	float:left;
       	list-style-type: none;
       	padding: 10px 0px 0px 10px;
       }
-      
       .level_buttons{
-      	float:right;
+      	z-index: 1;
+		position: absolute;
+		right: 0;
+		opacity: 1;
       }
-      
       .level_buttons form{
       	float:left;
       	padding: 0px 10px 0px 0px;
       }
-      
       .table_text{text-align: left;
       }
-
+	  #advancedSettings{
+	  	clear:left;
+	  	padding-top:20px;
+	  }
+	  #settings{
+	  	float:left;
+	  }
 	  .mode{
 	  	clear: both;
 		font-size: 10pt;
@@ -174,45 +181,48 @@
 		font-size: 10pt;
 		padding: 0 0 0 0;
 		margin-top: 2%;
+		cursor: pointer;
+	  }
+	  .nodeSwitch{
+	  	float:left;
+		font-size: 10pt;
+		padding: 0 0 0 0;
+		margin-top: 2%;
+		clear:both;
+		cursor: pointer;
 	  }
 	  .chord {
-	  font-size: 8pt; 
-	  font-family: sans-serif;
-	  height: 700px;
-	  padding-left: 0px;
-	}
-	
-	path.chord {
-	  fill-opacity: .85;
-	  stroke-opacity: 1.0;
-	}
-	
-	path{
-	  fill-opacity: 1.0;
-	  stroke-opacity: 1.0;
-	}
-	
-	.clickarea{
-	width: 280px;
-	height: 280px;
-	margin: 210px 0 0 -140px;
-	z-index: 1;
-	left:50%;
-	position: absolute;
-	cursor: pointer;
-	}
-	
-	svg.chord {
-	clear: both;
-	position: absolute;
-	z-index: 0;
-	left:50%;
-	margin-left:-350px;
-	width: 700px;
-	}
-	
-	.nodetext {pointer-events: none; font: 10px sans-serif; }
-	
+	  	font-size: 8pt; 
+	  	font-family: sans-serif;
+	  	height: 700px;
+	  	padding-left: 0px;
+	  }
+	  path.chord {
+	   	fill-opacity: .85;
+	  	stroke-opacity: 1.0;
+	  }
+	  path{
+	  	fill-opacity: 1.0;
+	  	stroke-opacity: 1.0;
+	  }
+	  .clickarea{
+		width: 280px;
+		height: 280px;
+		margin: 210px 0 0 -140px;
+		z-index: 1;
+		left:50%;
+		position: absolute;
+		cursor: pointer;
+	  }
+	  svg.chord {
+		clear: both;
+		position: absolute;
+		z-index: 0;
+		left:50%;
+		margin-left:-350px;
+		width: 700px;
+	  }
+	 .nodetext {pointer-events: none; font: 10px sans-serif; }
     </style>
   </head>
   <body>

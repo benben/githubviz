@@ -47,8 +47,33 @@
           		$('#desc_text').append($("<p>network of alters followed by and following ego</p>"));
       			$('#description').show();
       			$('form.level_form').hide();
+      			$('#advancedSettings').hide();
+      			$('.show_hide').hide();
         	});
-        	$('#showhide').toggle(
+        	$('.nodeSwitch').toggle(
+        		function(){
+	   			$('.nodeimage').hide();
+	   			$(this).attr('title', 'nodes as pics');
+           		$(this).text('nodes as pics');
+	  			d3.select("svg").selectAll("a").append("circle") 
+        			.attr("class", "circle")
+        			.attr("r", 5)
+            		.style("fill", "black");
+	  			$("#advancedSettings").append("<ul><li>Ruby</li><li>JavaScript</li><li>PHP</li></ul>")
+	  			},
+	  			function(){
+	   			//ev.prevent.Default();
+	   			//$('text.nodetext').animate({opacity: 1}, "slow");
+	   			$("#advancedSettings > ul").remove();
+	   			$('.circle').remove();
+	   			$('.nodeimage').show();
+	   			$(this).attr('title', 'nodes as circle');
+           		$(this).text('nodes as circle');
+	  			}	
+      		);
+		     
+		     
+		    $('#showhide').toggle(
         		function(){
 	   			//ev.prevent.Default();
 	   			$('text.nodetext').animate({opacity: 0}, "slow");
@@ -61,8 +86,8 @@
 	   			$(this).attr('title', 'hide user name');
            		$(this).text('hide user name');
 	  			}	
-      			);
-		       
+      		);
+      			 
         	$('#network_mode').click(function(ev){
 	          	ev.preventDefault();
 	          	
@@ -93,12 +118,12 @@
     	<div class="level_buttons"> 
       		<form class="level_form" action="/follower_viz" method="post">
       			<input name="user" type="hidden" value="<%= @user %>">
-      			<input type="submit" value="1 Level">
+      			<input style="cursor:pointer;" type="submit" value="1 Level">
       			<input type="hidden" name="level" value="1">
       		</form>
       		<form class="level_form" action="/follower_viz" method="post">
       			<input name="user" type="hidden" value="<%= @user %>">
-      			<input type="submit" value="2 Level">
+      			<input style="cursor:pointer;" type="submit" value="2 Level">
       			<input type="hidden" name="level" value="2">
       		</form>
 	      	<div class="mode">
@@ -107,9 +132,12 @@
 	    	</div>
 	    	
 	    	<button title="showOrHide" id ="showhide" class="show_hide">hide user name</button>
-	    	
+	    	<div id="advancedSettings">
+	    		<p id="settings">Advanced Settings</p>
+	    		<button title="NodeSwitch" class="nodeSwitch">nodes as circle</button>
+	    	</div>
     	</div>
-    	<div id ="desc_text" style="float:right;padding-right:18%">
+    	<div id ="desc_text">
     		<h3><%= @user%>'s network of <%= @data.keys.length%> followers</h3>
     		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
     		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
@@ -175,6 +203,7 @@
         .attr("width", "18px")
         .attr("height", "18px");*/
      node.append("svg:a")
+     	.attr("class", "nodelink")
         .attr('xlink:href', function(d) {return d.profilseite;})
         .attr('xlink:show', "new");
      d3.select("svg").selectAll("a").append("svg:image") 

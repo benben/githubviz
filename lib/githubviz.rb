@@ -26,6 +26,18 @@ def process_circle_data
    @circle_result.map! {|n|{"name" => n, "imports" => @test['data'][@circle_result.index(n)]}} 
 end
 
+def aquire_data
+   @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
+   @data[@user] = @api.get("/users/#{@user}")
+end
+
+def filter_data
+  @data[@user]['level'] = 0
+  @data[@user]['follower_count'] = @data[@user]['followers']
+  @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
+  @data[@user]['user'] = @api.get("/users/#{@user}")
+end
+
 def get_data
   if @level < @MAX_LEVELS
     t = {}
@@ -65,6 +77,10 @@ def process_data
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count']}}
 end
 
+def represent
+  erb :follower
+end
+
 get '/' do
   erb :index
 end
@@ -82,23 +98,11 @@ get '/follower_viz' do
   @user = params[:user]
   
   if @user
-
-    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
-    @data[@user] = @api.get("/users/#{@user}")
-
-    @data[@user]['level'] = 0
-    @data[@user]['follower_count'] = @data[@user]['followers']
-    @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
-    @data[@user]['user'] = @api.get("/users/#{@user}")
+    aquire_data
+    filter_data
     get_data
     process_data
-  #if @result.length > 0 then
-    erb :follower
-  #else
-   # get '/not_registered' do
-    #  erb :not_registered
-    #end
-  #end
+    represent
   end
 end
 
@@ -189,7 +193,7 @@ get '/repo_viz' do
   @j["repos"] = []
   @repos.each do |page|
     page.each do |repo|
-    @j["repos"] << {"name" => repo.name, "size" => repo.size}
+    @j["repos"] << {"name" => repo.name, "language" => repo.language}
   end
   end
 
