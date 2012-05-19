@@ -113,14 +113,14 @@ get '/repo_viz' do
  
 
   user_data = @api.users.get(@user)
-  my_repos = @api.repos.list
+  #my_repos = @api.repos.list
   page = 1
   count = 30
   user_repos = Array.new 
       
   while user_data.public_repos > count do
-  page = page +1
-  count = count + 30
+   page = page +1
+   count = count + 30
   end
   
   while page >= 1 do
@@ -128,75 +128,109 @@ get '/repo_viz' do
   page = page - 1
   end
     
-  a = 0 
-  b = 0 
-  c = 0
-  repo_name = Array.new
-  pr = Array.new
-  pr_closed = Array.new
-  pulldata = Array.new  
-  closed_pulldata = Array.new 
-  merge = ""
+  #a = 0 
+  #b = 0 
+  #c = 0
+  #repo_name = Array.new
+  #pr = Array.new
+  #pr_closed = Array.new
+  #pulldata = Array.new  
+  #closed_pulldata = Array.new 
+  #merge = ""
   
-  user_repos.each do |page|
-    page.each do |repo|
-    if repo.fork == true then
-       a = a + 1  
-       repo_name[a-1] = [repo.name, repo.source["owner"]["login"]]
-       pr[a-1] = {"pr_repodata" => @api.pulls.list(repo.source["owner"]["login"], repo.name), "repoowner" => repo.source["owner"]["login"], "reponame" => repo.name}
-       pr_closed[a-1] = {"closed_pr_repodata" => @api.pulls.list_closed(repo.source["owner"]["login"], repo.name), "repoowner" => repo.source["owner"]["login"], "reponame" => repo.name}
-    else
-       a = a
-    end
-    end
-  end
+  # user_repos.each do |page|
+    # page.each do |repo|
+    # if repo.fork == true then
+       # a = a + 1  
+       # repo_name[a-1] = [repo.name, repo.source["owner"]["login"]]
+       # pr[a-1] = {"pr_repodata" => @api.pulls.list(repo.source["owner"]["login"], repo.name), "repoowner" => repo.source["owner"]["login"], "reponame" => repo.name}
+       # pr_closed[a-1] = {"closed_pr_repodata" => @api.pulls.list_closed(repo.source["owner"]["login"], repo.name), "repoowner" => repo.source["owner"]["login"], "reponame" => repo.name}
+    # else
+       # a = a
+    # end
+    # end
+  # end
+#   
+ # pr.each do |pull|
+      # pull["pr_repodata"].each do |pullrequest|
+        # if pullrequest["user"]["login"] == @user then
+          # b = b + 1
+          # pulldata[b-1] = {"url" => pullrequest.url, "state" => pullrequest.state, "reponame" => pull["reponame"], "repoowner" => pull["repoowner"], "sum_pulls" => pull["pr_repodata"].length}
+        # else
+        # b = b
+        # end
+      # end
+    # end
+# 
+    # pr_closed.each do |closed_pull|
+      # closed_pull["closed_pr_repodata"].each do |closed_pullrequest|
+        # if closed_pullrequest["user"]["login"] == @user then
+          # c = c + 1
+          # #if closed_pullrequest.merged_at.nil? then
+          # # merge = ""
+          # #else
+          # # merge = closed_pullrequest.merged_at
+          # #end
+          # closed_pulldata[c-1] = {"title" => closed_pullrequest.title, "state" => closed_pullrequest.state, "created_at" => closed_pullrequest.created_at, "updated_at" => closed_pullrequest.updated_at, "closed_at" => closed_pullrequest.closed_at, "reponame" => closed_pull["reponame"], "repoowner" => closed_pull["repoowner"], "sum_pulls" => closed_pull["closed_pr_repodata"].length}
+        # else
+        # c = c
+        # end
+      # end
+    # end
+# 
+    # @pr_open = pr
+    # @number_of_forks = a
+    # @number_of_pulls = b
+    # @number_of_closed_pulls = c
+    # @number_of_all_pulls = b + c
+    # @pulldata = pulldata
+    # @closed_pulldata = closed_pulldata
+    # @reponame = repo_name
   
-  pr.each do |pull|
-    pull["pr_repodata"].each do |pullrequest|
-       if pullrequest["user"]["login"] == @user then
-           b = b + 1
-           pulldata[b-1] = {"url" => pullrequest.url, "state" => pullrequest.state, "reponame" => pull["reponame"], "repoowner" => pull["repoowner"], "sum_pulls" => pull["pr_repodata"].length} 
-       else
-           b = b    
-       end
-    end
-  end
   
-  pr_closed.each do |closed_pull|
-    closed_pull["closed_pr_repodata"].each do |closed_pullrequest|
-       if closed_pullrequest["user"]["login"] == @user then
-           c = c + 1
-           #if closed_pullrequest.merged_at.nil? then 
-            # merge = "" 
-           #else 
-            # merge = closed_pullrequest.merged_at 
-           #end
-           closed_pulldata[c-1] = {"title" => closed_pullrequest.title, "state" => closed_pullrequest.state, "created_at" => closed_pullrequest.created_at, "updated_at" => closed_pullrequest.updated_at, "closed_at" => closed_pullrequest.closed_at, "reponame" => closed_pull["reponame"], "repoowner" => closed_pull["repoowner"], "sum_pulls" => closed_pull["closed_pr_repodata"].length} 
-       else
-           c = c    
-       end
-    end
-  end
-  
-  @pr_open = pr
-  @number_of_forks = a
-  @number_of_pulls = b
-  @number_of_closed_pulls = c
-  @number_of_all_pulls = b + c
-  @pulldata = pulldata
-  @closed_pulldata = closed_pulldata
-  @reponame = repo_name
   @repos = user_repos
   
+  #get repo languages of a git user
   @j = {}
-  
-  @j["repos"] = []
+  start = 0
+  @j["repos"] = [] 
+  @j["repo_data"] = []
+  @j["language"] = []
+  @j["sort"] = {}
   @repos.each do |page|
     page.each do |repo|
-    @j["repos"] << {"name" => repo.name, "language" => repo.language}
+     @j["repos"] << {"language"=>repo.language,"count" => 0}
+    end
   end
+  
+  #remove doubles for comparing languages and count them
+  @j["repo_data"] = @j["repos"].uniq
+ 
+  #comparing languages of all repos and count them
+  @j["repo_data"].each do |language1|
+    @j["repos"].each do |language2|
+      if language1["language"] == language2["language"] then
+        language1["count"] += 1
+       
+      end
+    end
+    @j["sort"].store(language1["language"], language1["count"])
   end
-
+  
+  @sort = @j["sort"].sort_by {|key, value| -value}
+  #@j["repo_data"].sort_by { |a| [ a.count] }
+  #building treshold for languages
+  
+  # treshold = 0.5
+  # base = @j["repos"].length 
+  # base.to_f
+  # @j["repo_data"].each do |language|
+#     
+    # if (language["count"].to_f / base) >= treshold then
+      # @j["language"] <<  language["language"]
+    # end
+  # end
+  
   erb :repo
 end
 
