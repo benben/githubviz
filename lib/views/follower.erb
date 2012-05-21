@@ -59,7 +59,7 @@
         			.attr("class", "circle")
         			.attr("r", 5)
             		.style("fill", "black");
-	  			$("#advancedSettings").append("<ul><li>Ruby</li><li>JavaScript</li><li>PHP</li></ul>")
+	  			$("#advancedSettings").append("<ul><%@legend.each do |lang|%><li><%=lang['lang']%></li><%end%></ul>")
 	  			},
 	  			function(){
 	   			//ev.prevent.Default();
@@ -143,6 +143,10 @@
     		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
     		In the 2nd level all direct followers of <%=@user%>'s followers are additionally displayed.
     		</p>
+    		<!--<%@result['nodes'].each do |user|%>
+    		<p><%=user['name']%> : <%=user['scriptlanguage']%></p>
+    		<%end%>
+    		<%=@legend%>-->
     	</div>
     </div>
     <div style="clear:left;">
