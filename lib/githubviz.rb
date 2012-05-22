@@ -80,10 +80,15 @@ def process_data
   end
   
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "repos" => @data[n]["repos"]}}
+  
   script_language
 end
 
 def script_language
+  origin = 0
+  counter = 0
+  @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
+  
   @result['nodes'].each do |user|
     user_data = @api.users.get(user['name'])
     page = 1
@@ -141,9 +146,34 @@ def script_language
   end
   @scriptlanguage_legend = []
   @result['nodes'].each do |user|
-    @scriptlanguage_legend << {"lang" => user['scriptlanguage'], "count" => 1}
+    @scriptlanguage_legend << {"lang" => user['scriptlanguage'], "count" => 0, "color" => ""}
   end
   @legend = @scriptlanguage_legend.uniq
+  
+  if @legend.count <= @color.count then
+   @color = @color
+  else
+   color_adder = @legend.count - @color.count
+   while color_adder > 0
+     @color[@color.count - 1 + color_adder] = @color[origin]
+     color_adder -= 1
+     origin += 1
+   end 
+  end
+  
+  @legend.each do |lang|
+    @scriptlanguage_legend.each do |lang2|
+      if lang["lang"] == lang2["lang"] then
+        lang["count"] += 1
+        lang["color"] = @color[counter]
+        lang2["color"] = @color[counter]
+      end
+    end
+    counter += 1
+  end
+  
+  @legend = @legend.sort_by {|k| -k['count'] }
+  
 end
 
 def represent

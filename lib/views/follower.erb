@@ -53,13 +53,13 @@
         	$('.nodeSwitch').toggle(
         		function(){
 	   			$('.nodeimage').hide();
-	   			$(this).attr('title', 'nodes as pics');
-           		$(this).text('nodes as pics');
+	   			$(this).attr('title', 'OFF');
+           		$(this).text('OFF');
 	  			d3.select("svg").selectAll("a").append("circle") 
         			.attr("class", "circle")
         			.attr("r", 5)
             		.style("fill", "black");
-	  			$("#advancedSettings").append("<ul><%@legend.each do |lang|%><li><%=lang['lang']%></li><%end%></ul>")
+	  			$("#advancedSettings").append("<ul><%@legend.each do |lang|%><li style='color:<%=lang['color']%>'><%=lang['lang']%> : <%=lang['count']%></li><%end%></ul>")
 	  			},
 	  			function(){
 	   			//ev.prevent.Default();
@@ -67,8 +67,8 @@
 	   			$("#advancedSettings > ul").remove();
 	   			$('.circle').remove();
 	   			$('.nodeimage').show();
-	   			$(this).attr('title', 'nodes as circle');
-           		$(this).text('nodes as circle');
+	   			$(this).attr('title', 'ON');
+           		$(this).text('ON');
 	  			}	
       		);
 		     
@@ -133,8 +133,10 @@
 	    	
 	    	<button title="showOrHide" id ="showhide" class="show_hide">hide user name</button>
 	    	<div id="advancedSettings">
-	    		<p id="settings">Advanced Settings</p>
-	    		<button title="NodeSwitch" class="nodeSwitch">nodes as circle</button>
+	    		<h3 id="settings">Advanced Settings</h3>
+	    		
+	    		<button title="NodeSwitch" class="nodeSwitch">ON</button>
+	    		<p style="text-align:left">Script Language</p>
 	    	</div>
     	</div>
     	<div id ="desc_text">
