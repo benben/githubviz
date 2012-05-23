@@ -59,7 +59,7 @@
         			.attr("class", "circle")
         			.attr("r", 5)
             		.style("fill", "black");
-	  			$("#advancedSettings").append("<ul><%@legend.each do |lang|%><li style='color:<%=lang['color']%>'><%=lang['lang']%> : <%=lang['count']%></li><%end%></ul>")
+	  			$("#advancedSettings").append("<ul></ul>")
 	  			},
 	  			function(){
 	   			//ev.prevent.Default();
@@ -145,10 +145,6 @@
     		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
     		In the 2nd level all direct followers of <%=@user%>'s followers are additionally displayed.
     		</p>
-    		<!--<%@result['nodes'].each do |user|%>
-    		<p><%=user['name']%> : <%=user['scriptlanguage']%></p>
-    		<%end%>
-    		<%=@legend%>-->
     	</div>
     </div>
     <div style="clear:left;">
@@ -275,7 +271,7 @@
 			.style("fill", "#af001b");
      	});
      	d3.event.stopPropagation();
-    };	
+      };	
     };
     function lowlight() {
     	return function(i) {
@@ -306,14 +302,13 @@
 			.style("fill", "#666666");
      	});
      	d3.event.stopPropagation();
-    };	
+    	};	
     };
     });
     </script>
-       
     <%end %>
     <div class="ajaxBusy">
     	<p>Loading</p>
     	<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
     </div>
-    </div> 
+</div> 
