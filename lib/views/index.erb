@@ -27,10 +27,12 @@
             dataType: "html",
             //global:false,
             success: function(data) {
+              console.log(data);
               //if our ajax request is successful, replace the content of our viz div with the response data
               $('#content').html(data);
             },
             error: function(jqXHR){
+            	console.log(jqXHR);
             	if (jqXHR.status === 0) {
             		$('.gallery').append('<p>Not connect. Verify Network.</p>');
                 	//alert('Not connect.\n Verify Network.');
