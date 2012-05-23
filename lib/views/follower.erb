@@ -60,7 +60,7 @@
         			.attr("r", 5)
             		.style("fill", "black");
             	var x = <%= @legend.to_json%>;
-                console.log(x);
+                //console.log(x);
                 $.each(x, function(key, value){
                 	$("#advancedSettings").append("<ul><li style='color:" + value["color"] + "'>" + value["lang"] + " : " + value["count"] + "</li></ul>");
                 	
@@ -168,13 +168,13 @@
           .attr("width", w)
           .attr("height", h);
           
-      var a= <%= @api.to_json%>;   
-      var b = <%= @data.to_json%>;
-      console.log(a);
-      console.log(b);
+      //var a= <%= @api.to_json%>;   
+      //var b = <%= @data.to_json%>;
+      //console.log(a);
+      //console.log(b);
       
 	  var json = <%= @result.to_json %>; 
-	  console.log(json);
+	  //console.log(json);
       var force = d3.layout.force()
             .charge(-200)
             .linkDistance(30)
