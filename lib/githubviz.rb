@@ -28,8 +28,7 @@ end
 
 def aquire_data
    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
-   @data[@user] = @api.get("/users/#{@user}")
-         
+   @data[@user] = @api.get("/users/#{@user}")      
 end
 
 def filter_data
@@ -79,7 +78,7 @@ def process_data
     end
   end
   
-  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "repos" => @data[n]["repos"]}}
+  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count']}}
   
   script_language
 end
