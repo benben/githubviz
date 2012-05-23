@@ -59,7 +59,11 @@
         			.attr("class", "circle")
         			.attr("r", 5)
             		.style("fill", "black");
-	  			$("#advancedSettings").append("<ul><% @legend.each do |@lang| %><li><%@lang%></li><%end%></ul>");
+            	var x = <%= @legend.to_json%>;
+                console.log(x);
+                $.each(x, function(key, value){
+                	$("#advancedSettings").append("<ul><li>" + value["lang"] + " : " + value["count"] + "</li></ul>");
+                });
 	  			},
 	  			function(){
 	   			//ev.prevent.Default();
