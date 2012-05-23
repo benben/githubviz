@@ -165,7 +165,9 @@
       var vis = d3.select("#chart").append("svg")
           .attr("width", w)
           .attr("height", h);
+      
 	  var json = <%= @result.to_json %>; 
+	  console.log(json);
       var force = d3.layout.force()
             .charge(-200)
             .linkDistance(30)
