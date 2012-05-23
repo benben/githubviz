@@ -78,7 +78,7 @@ def process_data
     end
   end
   
-  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count']}}
+  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "color" => ""}}
   
   script_language
 end
@@ -161,8 +161,8 @@ def script_language
   end
   
   @legend.each do |lang|
-    @scriptlanguage_legend.each do |lang2|
-      if lang["lang"] == lang2["lang"] then
+    @result['nodes'].each do |lang2|
+      if lang["lang"] == lang2["scriptlanguage"] then
         lang["count"] += 1
         lang["color"] = @color[counter]
         lang2["color"] = @color[counter]

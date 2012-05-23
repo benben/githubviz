@@ -7,19 +7,21 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
     <script type="text/javascript">
       $(function (){
-      	// Ajax activity indicator bound to ajax send/complete
-	    $("#viz_form").bind("ajaxSend", function(){
-   			$(".ajaxBusy").show();
- 	    }).bind("ajaxComplete", function(){
-   			$(".ajaxBusy").hide();
- 	    });
-
         $('#viz_form').submit(function(ev){
           //this happens if form is submitted
           //prevent the default behavior of a form (it should do nothing in our case)
           ev.preventDefault();
           //send an ajax request to our action
           $.ajax({
+          	// Ajax activity indicator bound to ajax send/complete
+          	beforeSend: function(){
+          		$('#chart').hide();
+          		$('.ajaxBusy').show();	
+          	},
+            complete: function(){
+            	$('#chart').show();
+            	$('.ajaxBusy').hide();
+            },	
             url: "/follower_viz",
             //serialize the form and use it as data for our ajax request
             data: $(this).serialize(),

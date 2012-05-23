@@ -58,7 +58,8 @@
 	  			d3.select("svg").selectAll("a").append("circle") 
         			.attr("class", "circle")
         			.attr("r", 5)
-            		.style("fill", "black");
+            		.style("fill", function(d) { return d.color;});
+            	            		
             	var x = <%= @legend.to_json%>;
                 //console.log(x);
                 $.each(x, function(key, value){
@@ -119,7 +120,7 @@
         });
     </script>
     <div class="vis" id="viz">
-    <div class="description">
+    <div class="description" id="desc1">
     	<div class="level_buttons"> 
       		<form class="level_form" action="/follower_viz" method="post">
       			<input name="user" type="hidden" value="<%= @user %>">
@@ -160,18 +161,13 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
     <script type='text/javascript'>
     $(function (){
-    console.log("d3.js");
+    
       var w = $(window).width() - 20
           h = $(window).height() - $("#header").height() -150
           fill = d3.scale.category20();
       var vis = d3.select("#chart").append("svg")
           .attr("width", w)
           .attr("height", h);
-          
-      //var a= <%= @api.to_json%>;   
-      //var b = <%= @data.to_json%>;
-      //console.log(a);
-      //console.log(b);
       
 	  var json = <%= @result.to_json %>; 
 	  //console.log(json);
@@ -313,6 +309,7 @@
     </script>
     <%end %>
     <div class="ajaxBusy">
+    	<br/>
     	<p>Loading</p>
     	<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
     </div>
