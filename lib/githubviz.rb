@@ -80,10 +80,100 @@ def process_data
   
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count']}}
   
-  #script_language
+  script_language
 end
 
+def script_language
+  origin = 0
+  counter = 0
+  @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
+  
+  @result['nodes'].each do |user|
+    user_data = @api.users.get(user['name'])
+    page = 1
+    count = 30
+    user_repos = Array.new 
+      
+    while user_data.public_repos > count do
+      page = page +1
+      count = count + 30
+    end
+  
+    while page >= 1 do
+      user_repos[page-1] = @api.repos.list_repos(user['name'], page)
+      page = page - 1
+    end
 
+    @repos = user_repos
+    #get repo languages of a git user
+    @j = {}
+    start = 0
+    @j["repos"] = [] 
+    @j["repo_data"] = []
+    @j["language"] = []
+    @j["sort"] = {}
+    @j["max_lang"]=[]
+    @repos.each do |page|
+      page.each do |repo|
+        @j["repos"] << {"language"=>repo.language,"count" => 0}
+      end
+    end
+  
+    #remove doubles for comparing languages and count them
+    @j["repo_data"] = @j["repos"].uniq
+ 
+    #comparing languages of all repos and count them
+    @j["repo_data"].each do |language1|
+      @j["repos"].each do |language2|
+        if language1["language"] == language2["language"] then
+          language1["count"] += 1
+        end
+      end
+      @j["sort"].store(language1["language"], language1["count"])
+    end
+    @sort = @j["sort"].sort_by {|key, value| -value}
+    unless @sort.empty?
+      @sort.each do |scriptlanguage|
+        if scriptlanguage[1] == @sort[0][1] then
+          @j["max_lang"] << scriptlanguage[0]
+        end
+      end
+    else
+      @j["max_lang"] << "nothing"
+    end  
+    user['scriptlanguage'] = @j["max_lang"]
+  end
+  @scriptlanguage_legend = []
+  @result['nodes'].each do |user|
+    @scriptlanguage_legend << {"lang" => user['scriptlanguage'], "count" => 0, "color" => ""}
+  end
+  @legend = @scriptlanguage_legend.uniq
+  
+  if @legend.count <= @color.count then
+   @color = @color
+  else
+   color_adder = @legend.count - @color.count
+   while color_adder > 0
+     @color[@color.count - 1 + color_adder] = @color[origin]
+     color_adder -= 1
+     origin += 1
+   end 
+  end
+  
+  @legend.each do |lang|
+    @scriptlanguage_legend.each do |lang2|
+      if lang["lang"] == lang2["lang"] then
+        lang["count"] += 1
+        lang["color"] = @color[counter]
+        lang2["color"] = @color[counter]
+      end
+    end
+    counter += 1
+  end
+  
+  @legend = @legend.sort_by {|k| -k['count'] }
+  
+end
 
 def represent
   erb :follower
