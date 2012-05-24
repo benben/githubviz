@@ -30,7 +30,6 @@
             dataType: "html",
             //global:false,
             success: function(data) {
-              
               //if our ajax request is successful, replace the content of our viz div with the response data
               $('#content').html(data);
             },
@@ -56,7 +55,7 @@
 	  	$('#viz_commits').append($("<strong>Commit Activity</strong>"));
       	$('#menu').show();
         });
-
+        
         $('#viz_network').click(function(ev){
 
           ev.preventDefault();
@@ -70,7 +69,7 @@
             }
           });
         });
-
+        
 		$('#viz_repos').click(function(ev){
 			
           ev.preventDefault();
@@ -84,6 +83,7 @@
             }
           });
         });
+        
 		$('#viz_commits').click(function(ev){
 
           ev.preventDefault();
@@ -99,8 +99,6 @@
         });
       });
     </script>
-
-    
     <style>
       .ajaxBusy{
     	display:none;
@@ -176,9 +174,6 @@
 	  	padding-top:20px;
 	  	text-align:left;
 	  }
-	  #settings{
-	  	
-	  }
 	  .mode{
 	  	clear: both;
 		font-size: 10pt;
@@ -234,27 +229,24 @@
     </style>
   </head>
   <body>
-  	      
   	<!--[if IE]>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
-    <style>
-     .chromeFrameInstallDefaultStyle {
-       width: 100%; /* default is 800px */
-       border: 5px solid blue;
-     }
-    </style>
-    <script>
-     // The conditional ensures that this code will only execute in IE,
-     // Therefore we can use the IE-specific attachEvent without worry
-     window.attachEvent("onload", function() {
-       CFInstall.check({
-         mode: "overlay" // the default
-         
-       });
-     });
-    </script>
+    	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+    	<style>
+     		.chromeFrameInstallDefaultStyle {
+       			width: 100%; /* default is 800px */
+       			border: 5px solid blue;
+     		}
+    	</style>
+    	<script>
+     		// The conditional ensures that this code will only execute in IE,
+     		// Therefore we can use the IE-specific attachEvent without worry
+     		window.attachEvent("onload", function() {
+       			CFInstall.check({
+         			mode: "overlay" // the default
+       			});
+     		});
+    	</script>
   	<![endif]-->
-  	
     <div id="header">
     	<div style="float:left;">
     		<h1><a href="/" name="go home">githubviz</a></h1>
@@ -266,27 +258,26 @@
       			<input type="submit" value="Do it!">
       			<input type="hidden" name="level" value="1">
     		</form>
-  	</div>
-	<div id="menu">
-      	<ul>
-		<li><a id="viz_network" href="#"></a></li>
-		<li><a id="viz_repos" href="#"></a></li>
-		<li><a id="viz_commits" href="#"></a></li>
-      	</ul>
+  		</div>
+		<div id="menu">
+      		<ul>
+				<li><a id="viz_network" href="#"></a></li>
+				<li><a id="viz_repos" href="#"></a></li>
+				<li><a id="viz_commits" href="#"></a></li>
+      		</ul>
     	</div>
     </div>
     <div id="content">  
-    <div class="vis">
-    <div class="description">
-	<p>Please enter your user name! You're not registered? Please register a user name @ github!</p>
-    </div>
-    <div class="gallery">
-    </div>
-	</div>
-	<div class="ajaxBusy">
-		<p>Loading</p>
-		<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
-	</div> 
+    	<div class="vis">
+    		<div class="description">
+				<p>Please enter your user name! You're not registered? Please register a user name @ github!</p>
+    		</div>
+    		<div class="gallery"></div>
+		</div>
+		<div class="ajaxBusy">
+			<p>Loading</p>
+			<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
+		</div> 
 	</div>
   </body>
 </html>

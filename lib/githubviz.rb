@@ -9,9 +9,6 @@ class GithubViz < Sinatra::Base
 require 'github-v3-api.rb'
 
 set :app_file, __FILE__
-#set :views, File.dirname(__FILE__) + '/views'
-#set :public_directory, Proc.new { File.join(root, "public") }
-#set :public_folder, File.dirname(__FILE__) + '/public'
 
 def process_circle_data
    @test = {}
@@ -26,18 +23,20 @@ def process_circle_data
    @circle_result.map! {|n|{"name" => n, "imports" => @test['data'][@circle_result.index(n)]}} 
 end
 
+def represent_circle_data
+  erb :circle
+end
+
 def aquire_data
    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
    @data[@user] = @api.get("/users/#{@user}")      
 end
 
 def filter_data
-  
   @data[@user]['level'] = 0
   @data[@user]['follower_count'] = @data[@user]['followers']
   @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
   @data[@user]['user'] = @api.get("/users/#{@user}")
-  
 end
 
 def get_data
@@ -64,7 +63,6 @@ def get_data
 end
 
 def process_data
-  
   @result['nodes'] = @data.keys
   @result['links'] = []
   
@@ -93,19 +91,18 @@ def script_language
     page = 1
     count = 30
     user_repos = Array.new 
-      
+    # begin handle repo paging  
     while user_data.public_repos > count do
       page = page +1
       count = count + 30
     end
-  
+    # end handle repo pging  
     while page >= 1 do
       user_repos[page-1] = @api.repos.list_repos(user['name'], page)
       page = page - 1
     end
-
+    #begin preparing to get repo languages of a git user
     @repos = user_repos
-    #get repo languages of a git user
     @j = {}
     start = 0
     @j["repos"] = [] 
@@ -118,7 +115,8 @@ def script_language
         @j["repos"] << {"language"=>repo.language,"count" => 0}
       end
     end
-  
+    # end preparing to get scriptlanguages of a git user
+    
     #remove doubles for comparing languages and count them
     @j["repo_data"] = @j["repos"].uniq
  
@@ -131,7 +129,9 @@ def script_language
       end
       @j["sort"].store(language1["language"], language1["count"])
     end
+    #sort descending by language counts
     @sort = @j["sort"].sort_by {|key, value| -value}
+    #compare languages (langauage or no language?) and add scriptlanguage to result
     unless @sort.empty?
       @sort.each do |scriptlanguage|
         if scriptlanguage[1] == @sort[0][1] then
@@ -143,12 +143,13 @@ def script_language
     end  
     user['scriptlanguage'] = @j["max_lang"]
   end
+  #prepring to get legend for scriptlanguages
   @scriptlanguage_legend = []
   @result['nodes'].each do |user|
     @scriptlanguage_legend << {"lang" => user['scriptlanguage'], "count" => 0, "color" => ""}
   end
   @legend = @scriptlanguage_legend.uniq
-  
+  #add colors for languages
   if @legend.count <= @color.count then
    @color = @color
   else
@@ -159,7 +160,7 @@ def script_language
      origin += 1
    end 
   end
-  
+  #get languages, count them and add color to result
   @legend.each do |lang|
     @result['nodes'].each do |lang2|
       if lang["lang"] == lang2["scriptlanguage"] then
@@ -170,9 +171,8 @@ def script_language
     end
     counter += 1
   end
-  
+  #language sort descending by counts
   @legend = @legend.sort_by {|k| -k['count'] }
-  
 end
 
 def represent
@@ -229,7 +229,7 @@ get '/circle_viz' do
   @data = {}
   @user = params[:user]
   @MAX_LEVELS = 1 
-if @user
+  if @user
     @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
@@ -238,8 +238,8 @@ if @user
     @data[@user]['user'] = @api.get("/users/#{@user}")
     get_data
     process_circle_data
-    end  
-  erb :circle
+  end  
+  represent_circle_data
 end
 
 end
