@@ -1,28 +1,26 @@
 <% if @result.length > 0 then%>
-    <script type="text/javascript">
-    var showOrHide = true;
-      	$(function (){
-      		
+   <script type="text/javascript">
+   var showOrHide = true;
+      	$(function (){   		
         	$('.level_form').submit(function(ev){
           		ev.preventDefault();
           		$.ajax({
-          				beforeSend: function(){
-          					$('#chart').hide();
-          					$('#desc_text').hide();
-          					$('.ajaxBusy').show();
-          					
-          				},
-            			complete: function(){
-            				$('#chart').show();
-            				$('#desc_text').show();
-            				$('.ajaxBusy').hide();
-            			},	
-            			url: "/follower_viz",
-            			data: $(this).serialize(),
-            			dataType: "html",
-            			success: function(data) {
-              				$('#viz').html(data);
-            			}
+          			beforeSend: function(){
+          				$('#chart').hide();
+          				$('#desc_text').hide();
+          				$('.ajaxBusy').show();
+          			},
+            		complete: function(){
+            			$('#chart').show();
+            			$('#desc_text').show();
+            			$('.ajaxBusy').hide();
+            		},	
+            		url: "/follower_viz",
+            		data: $(this).serialize(),
+            		dataType: "html",
+            		success: function(data) {
+              			$('#viz').html(data);
+            		}
          		});
          	}); 
          	$('#circle_mode').click(function(ev){
@@ -52,45 +50,38 @@
         	});
         	$('.nodeSwitch').toggle(
         		function(){
-	   			$('.nodeimage').hide();
-	   			$(this).attr('title', 'OFF');
-           		$(this).text('OFF');
-	  			d3.select("svg").selectAll("a").append("circle") 
-        			.attr("class", "circle")
-        			.attr("r", 5)
-            		.style("fill", function(d) { return d.color;});
+	   				$('.nodeimage').hide();
+	   				$(this).attr('title', 'OFF');
+           			$(this).text('OFF');
+	  				d3.select("svg").selectAll("a").append("circle") 
+        				.attr("class", "circle")
+        				.attr("r", 5)
+            			.style("fill", function(d) { return d.color;});
             	            		
-            	var x = <%= @legend.to_json%>;
-                //console.log(x);
-                $.each(x, function(key, value){
-                	$("#advancedSettings").append("<ul><li style='color:" + value["color"] + "'>" + value["lang"] + " : " + value["count"] + "</li></ul>");
-                	
-                });
+            		var x = <%= @legend.to_json%>;
+                	$.each(x, function(key, value){
+                		$("#advancedSettings").append("<ul><li style='color:" + value["color"] + "'>" + value["lang"] + " : " + value["count"] + "</li></ul>");
+                	});
 	  			},
 	  			function(){
-	   			//ev.prevent.Default();
-	   			//$('text.nodetext').animate({opacity: 1}, "slow");
-	   			$("#advancedSettings > ul").remove();
-	   			$('.circle').remove();
-	   			$('.nodeimage').show();
-	   			$(this).attr('title', 'ON');
-           		$(this).text('ON');
+	   				$("#advancedSettings > ul").remove();
+	   				$('.circle').remove();
+	   				$('.nodeimage').show();
+	   				$(this).attr('title', 'ON');
+           			$(this).text('ON');
 	  			}	
       		);
-		     
-		     
+      		
 		    $('#showhide').toggle(
         		function(){
-	   			//ev.prevent.Default();
-	   			$('text.nodetext').animate({opacity: 0}, "slow");
-	   			$(this).attr('title', 'show user name');
-           		$(this).text('show user name');
+	   				$('text.nodetext').animate({opacity: 0}, "slow");
+	   				$(this).attr('title', 'show user name');
+           			$(this).text('show user name');
 	  			},
 	  			function(){
-	   			//ev.prevent.Default();
-	   			$('text.nodetext').animate({opacity: 1}, "slow");
-	   			$(this).attr('title', 'hide user name');
-           		$(this).text('hide user name');
+	   				$('text.nodetext').animate({opacity: 1}, "slow");
+	   				$(this).attr('title', 'hide user name');
+           			$(this).text('hide user name');
 	  			}	
       		);
       			 
@@ -98,29 +89,28 @@
 	          	ev.preventDefault();
 	          	
 			    $.ajax({
-			    		beforeSend: function(){
-          					$('#chart').hide();
-          					$('#desc_text').hide();
-          					$('.ajaxBusy').show();
-          					
-          				},
-            			complete: function(){
-            				$('#chart').show();
-            				$('#desc_text').show();
-            				$('.ajaxBusy').hide();
-            			},
-			            url: "/follower_viz",
-			            data: $("#viz_form").serialize(),
-			            dataType: "html",
-			            success: function(data) {
-			              $('#viz').html(data);
-			        	}
+			    	beforeSend: function(){
+          				$('#chart').hide();
+          				$('#desc_text').hide();
+          				$('.ajaxBusy').show();
+          			},
+            		complete: function(){
+            			$('#chart').show();
+            			$('#desc_text').show();
+            			$('.ajaxBusy').hide();
+            		},
+			        url: "/follower_viz",
+			        data: $("#viz_form").serialize(),
+			        dataType: "html",
+			        success: function(data) {
+			        	$('#viz').html(data);
+			        }
 	          	});
         	});
         });
-    </script>
-    <div class="vis" id="viz">
-    <div class="description" id="desc1">
+   </script>
+   <div class="vis" id="viz">
+   <div class="description" id="desc1">
     	<div class="level_buttons"> 
       		<form class="level_form" action="/follower_viz" method="post">
       			<input name="user" type="hidden" value="<%= @user %>">
@@ -133,8 +123,8 @@
       			<input type="hidden" name="level" value="2">
       		</form>
 	      	<div class="mode">
-	    	<a href="#" id ="circle_mode" class="mode">Circle Mode</a>
-	    	<a href="#" id ="network_mode" class="mode">Network Mode</a>
+	    		<a href="#" id ="circle_mode" class="mode">Circle Mode</a>
+	    		<a href="#" id ="network_mode" class="mode">Network Mode</a>
 	    	</div>
 	    	
 	    	<button title="showOrHide" id ="showhide" class="show_hide">hide user name</button>
@@ -152,67 +142,49 @@
     		In the 2nd level all direct followers of <%=@user%>'s followers are additionally displayed.
     		</p>
     	</div>
-    </div>
-    <div style="clear:left;">
+   </div>
+   <div style="clear:left;">
       <div class='gallery' id='chart'> </div>
-    </div>
-    <script src='d3.layout.js?2.7.2' type='text/javascript'></script>
-    <script src='d3.geom.js?2.7.2' type='text/javascript'> </script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-    <script type='text/javascript'>
-    $(function (){
+   </div>
+   <script src='d3.layout.js?2.7.2' type='text/javascript'></script>
+   <script src='d3.geom.js?2.7.2' type='text/javascript'> </script>
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+   <script type='text/javascript'>
+   $(function (){
     
-      var w = $(window).width() - 20
+   var w = $(window).width() - 20
           h = $(window).height() - $("#header").height() -150
           fill = d3.scale.category20();
-      var vis = d3.select("#chart").append("svg")
+   var vis = d3.select("#chart").append("svg")
           .attr("width", w)
           .attr("height", h);
       
-	  var json = <%= @result.to_json %>; 
-	  //console.log(json);
-      var force = d3.layout.force()
+   var json = <%= @result.to_json %>; 
+	  
+   var force = d3.layout.force()
             .charge(-200)
             .linkDistance(30)
             .nodes(json.nodes)
             .links(json.links)
             .size([w, h])
             .start();	
-      var link = vis.selectAll("line.link")
+    var link = vis.selectAll("line.link")
             .data(json.links)
             .enter().append("line")
             .attr("class", "link")
             .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-            //.style("fill", "#555555")
       		.style("stroke","#666666")
             .attr("x1", function(d) { return d.source.x; })
             .attr("y1", function(d) { return d.source.y; })
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; });
-      var node = vis.selectAll("g.node")
-        //var node = vis.selectAll("image.node")
+    var node = vis.selectAll("g.node")
             .data(json.nodes)
-              //.enter().append("svg:image")
-              //.enter().append("circle")
                .enter().append("svg:g")
-            //.attr("xlink:href", function(d) { return d.img; })
-            //.attr("class", "nodeimage")
-            //.attr("width", "18px")
-            //.attr("height", "18px")
-            //.attr("x", function(d) { return d.x-12.5; })
-            //.attr("y", function(d) { return d.y-12.5; })
-            //.attr("r", 5);
-            //.style("fill", function(d) { return fill(d.follower_count); })
             .on("mouseover", highlight())
             .on("mouseout", lowlight())
             .call(force.drag);
-    /*node.append("svg:image")
-        .attr("class", "nodeimage")
-        .attr("xlink:href", function(d) { return d.img; })
-        .attr("x", "-9px")
-        .attr("y", "-9px")
-        .attr("width", "18px")
-        .attr("height", "18px");*/
+            
      node.append("svg:a")
      	.attr("class", "nodelink")
         .attr('xlink:href', function(d) {return d.profilseite;})
