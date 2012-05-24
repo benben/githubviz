@@ -23,10 +23,6 @@ def process_circle_data
    @circle_result.map! {|n|{"name" => n, "imports" => @test['data'][@circle_result.index(n)]}} 
 end
 
-def represent_circle_data
-  erb :circle
-end
-
 def aquire_data
    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
    @data[@user] = @api.get("/users/#{@user}")      
@@ -229,7 +225,7 @@ get '/circle_viz' do
   @data = {}
   @user = params[:user]
   @MAX_LEVELS = 1 
-  if @user
+if @user
     @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
     @data[@user] = @api.get("/users/#{@user}")
     @data[@user]['level'] = 0
@@ -238,8 +234,8 @@ get '/circle_viz' do
     @data[@user]['user'] = @api.get("/users/#{@user}")
     get_data
     process_circle_data
-  end  
-  represent_circle_data
+    end  
+  erb :circle
 end
 
 end
