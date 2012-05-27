@@ -61,6 +61,14 @@
           ev.preventDefault();
 
           $.ajax({
+          	beforeSend: function(){
+          		$('#chart').hide();
+          		$('.ajaxBusy').show();
+          	},
+            complete: function(){
+            	$('#chart').show();
+            	$('.ajaxBusy').hide();
+            },
             url: "/follower_viz",
             data: $("#viz_form").serialize(),
             dataType: "html",
