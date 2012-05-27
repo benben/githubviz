@@ -2,6 +2,10 @@
 
 require 'rubygems'
 require 'sinatra'
+require 'active_record'
+
+class Request < ActiveRecord::Base
+end
 
 class ApiConnection
 
@@ -19,7 +23,7 @@ class ApiConnection
   def users url
     @connection.users.get url
   end
-  
+
   def repos url, page
     @connection.repos.list_repos url, page
   end
@@ -31,11 +35,16 @@ class GithubViz < Sinatra::Base
 
 set :app_file, __FILE__
 
+require 'config'
+
 begin
   @@api = ApiConnection.new ENV['GITHUB_API_KEY']
 rescue ArgumentError
   raise ApiConnection::NoApiKeyError, "Please set the ENV['GITHUB_API_KEY'] var"
 end
+
+ActiveRecord::Base.establish_connection(@@config)
+ActiveRecord::Base.connection
 
 def process_circle_data
    @test = {}
@@ -103,7 +112,7 @@ def process_data
   #if @lang == 1
   script_language
   #end
-  
+
 end
 
 def script_language
@@ -121,7 +130,7 @@ def script_language
       page = page +1
       count = count + 30
     end
-    # end handle repo paging  
+    # end handle repo paging
 
     while page >= 1 do
       user_repos[page-1] = @@api.repos(user['name'], page)
@@ -220,7 +229,7 @@ get '/follower_viz' do
   @MAX_LEVELS = params[:level].to_i
 
   @user = params[:user]
- 
+
   #@lang = params[:script_language].to_i
 
   @page = 1
