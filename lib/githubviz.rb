@@ -74,7 +74,10 @@ def process_data
   
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "color" => ""}}
   
+    #if @lang == 1
   script_language
+     #end
+  
 end
 
 def script_language
@@ -92,7 +95,7 @@ def script_language
       page = page +1
       count = count + 30
     end
-    # end handle repo pging  
+    # end handle repo paging  
     while page >= 1 do
       user_repos[page-1] = @api.repos.list_repos(user['name'], page)
       page = page - 1
@@ -190,6 +193,8 @@ get '/follower_viz' do
   @MAX_LEVELS = params[:level].to_i
 
   @user = params[:user]
+  
+  #@lang = params[:script_language].to_i
   
   @page = 1
   @count = 30
