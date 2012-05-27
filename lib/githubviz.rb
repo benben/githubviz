@@ -16,6 +16,14 @@ class ApiConnection
     @connection.get url
   end
 
+  def users url
+    @connection.users.get url
+  end
+  
+  def repos url, page
+    @connection.repos.list_repos url, page
+  end
+
   NoApiKeyError = Class.new(StandardError)
 end
 
@@ -43,15 +51,14 @@ def process_circle_data
 end
 
 def aquire_data
-   @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
-   @data[@user] = @api.get("/users/#{@user}")
+   @data[@user] = @@api.get("/users/#{@user}")
 end
 
 def filter_data
   @data[@user]['level'] = 0
   @data[@user]['follower_count'] = @data[@user]['followers']
-  @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
-  @data[@user]['user'] = @api.get("/users/#{@user}")
+  @data[@user]['followers'] = @@api.get("/users/#{@user}/followers")
+  @data[@user]['user'] = @@api.get("/users/#{@user}")
 end
 
 def get_data
@@ -59,13 +66,13 @@ def get_data
     t = {}
     @data.each do |k,v|
       if v['level'] == @level
-        @api.get("/users/#{k}/followers").each do |f|
+        @@api.get("/users/#{k}/followers").each do |f|
           unless @data.has_key? f['login']
             t[f['login']] = f
             t[f['login']]['level'] = @level+1
             t[f['login']]['follower_count'] = 0
-            t[f['login']]['followers'] = @api.get("/users/#{f['login']}/followers")
-            t[f['login']]['user'] = @api.get("/users/#{f['login']}")
+            t[f['login']]['followers'] = @@api.get("/users/#{f['login']}/followers")
+            t[f['login']]['user'] = @@api.get("/users/#{f['login']}")
 
           end
         end
@@ -105,7 +112,7 @@ def script_language
   @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
 
   @result['nodes'].each do |user|
-    user_data = @api.users.get(user['name'])
+    user_data = @@api.users(user['name'])
     page = 1
     count = 30
     user_repos = Array.new
@@ -117,7 +124,7 @@ def script_language
     # end handle repo paging  
 
     while page >= 1 do
-      user_repos[page-1] = @api.repos.list_repos(user['name'], page)
+      user_repos[page-1] = @@api.repos(user['name'], page)
       page = page - 1
     end
     #begin preparing to get repo languages of a git user
@@ -232,9 +239,7 @@ end
 get '/repo_viz' do
   @user = params[:user]
 
-  @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
-
-  user_data = @api.users.get(@user)
+  user_data = @@api.users(@user)
 
   erb :repo
 end
@@ -251,12 +256,11 @@ get '/circle_viz' do
   @user = params[:user]
   @MAX_LEVELS = 1
 if @user
-    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
-    @data[@user] = @api.get("/users/#{@user}")
+    @data[@user] = @@api.get("/users/#{@user}")
     @data[@user]['level'] = 0
     @data[@user]['follower_count'] = @data[@user]['followers']
-    @data[@user]['followers'] = @api.get("/users/#{@user}/followers")
-    @data[@user]['user'] = @api.get("/users/#{@user}")
+    @data[@user]['followers'] = @@api.get("/users/#{@user}/followers")
+    @data[@user]['user'] = @@api.get("/users/#{@user}")
     get_data
     process_circle_data
     end
