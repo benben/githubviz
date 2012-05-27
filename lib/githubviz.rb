@@ -3,12 +3,31 @@
 require 'rubygems'
 require 'sinatra'
 
+class ApiConnection
+
+  require 'github_v3_api/github_v3_api.rb'
+
+  def initialize api_key
+    puts "#{Time.now}: Initializing ApiConnection..."
+    @connection = GitHubV3API.new(api_key)
+  end
+
+  def get url
+    @connection.get url
+  end
+
+  NoApiKeyError = Class.new(StandardError)
+end
 
 class GithubViz < Sinatra::Base
 
-require 'github-v3-api.rb'
-
 set :app_file, __FILE__
+
+begin
+  @@api = ApiConnection.new ENV['GITHUB_API_KEY']
+rescue ArgumentError
+  raise ApiConnection::NoApiKeyError, "Please set the ENV['GITHUB_API_KEY'] var"
+end
 
 def process_circle_data
    @test = {}

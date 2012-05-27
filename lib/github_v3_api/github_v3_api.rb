@@ -1,3 +1,5 @@
+$LOAD_PATH << "./lib/github_v3_api"
+
 require 'rest-client'
 require 'json'
 require 'github_v3_api/entity'
@@ -77,8 +79,8 @@ class GitHubV3API
   def pulls
     PullsAPI.new(self)
   end
-  
-  
+
+
   def commits
     CommitsAPI.new(self)
   end
