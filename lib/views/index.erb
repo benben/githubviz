@@ -17,12 +17,12 @@
           	// Ajax activity indicator bound to ajax send/complete
           	beforeSend: function(){
           		$('#chart').hide();
-          		$('.ajaxBusy').show();	
+          		$('.ajaxBusy').show();
           	},
             complete: function(){
             	$('#chart').show();
             	$('.ajaxBusy').hide();
-            },	
+            },
             url: "/follower_viz",
             //serialize the form and use it as data for our ajax request
             data: $(this).serialize(),
@@ -34,7 +34,7 @@
               $('#content').html(data);
             },
             error: function(jqXHR){
-            	
+
             	if (jqXHR.status === 0) {
             		$('.gallery').append('<p>Not connect. Verify Network.</p>');
                 	//alert('Not connect.\n Verify Network.');
@@ -71,9 +71,9 @@
         });
 
 		$('#viz_repos').click(function(ev){
-			
+
           ev.preventDefault();
-          
+
           $.ajax({
             url: "/repo_viz",
             data: "user="+$("#viz_form input:first").val(),
@@ -135,7 +135,7 @@
       }
       #desc_text{
       	width:500px;
-      	margin-left:30.5%;
+      	margin-left:30.6%;
       }
       #header{
       	padding:10px;
@@ -174,7 +174,7 @@
 	  	text-align:left;
 	  }
 	  #settings{
-	  	
+
 	  }
 	  .mode{
 	  	clear: both;
@@ -197,7 +197,7 @@
 		cursor: pointer;
 	  }
 	  .chord {
-	  	font-size: 8pt; 
+	  	font-size: 8pt;
 	  	font-family: sans-serif;
 	  	height: 700px;
 	  	padding-left: 0px;
@@ -245,7 +245,7 @@
      window.attachEvent("onload", function() {
        CFInstall.check({
          mode: "overlay" // the default
-         
+
        });
      });
     </script>
@@ -270,7 +270,7 @@
       		</ul>
     	</div>
     </div>
-    <div id="content">  
+    <div id="content">
     	<div class="vis">
     		<div class="description">
 				<p>Please enter your user name! You're not registered? Please register a user name @ github!</p>
@@ -280,7 +280,7 @@
 		<div class="ajaxBusy">
 			<p>Loading</p>
 			<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
-		</div> 
+		</div>
 	</div>
   </body>
 </html>

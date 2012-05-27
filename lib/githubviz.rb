@@ -3,12 +3,31 @@
 require 'rubygems'
 require 'sinatra'
 
+class ApiConnection
+
+  require 'github_v3_api/github_v3_api.rb'
+
+  def initialize api_key
+    puts "#{Time.now}: Initializing ApiConnection..."
+    @connection = GitHubV3API.new(api_key)
+  end
+
+  def get url
+    @connection.get url
+  end
+
+  NoApiKeyError = Class.new(StandardError)
+end
 
 class GithubViz < Sinatra::Base
 
-require 'github-v3-api.rb'
-
 set :app_file, __FILE__
+
+begin
+  @@api = ApiConnection.new ENV['GITHUB_API_KEY']
+rescue ArgumentError
+  raise ApiConnection::NoApiKeyError, "Please set the ENV['GITHUB_API_KEY'] var"
+end
 
 def process_circle_data
    @test = {}
@@ -20,12 +39,12 @@ def process_circle_data
       @test['data'][@circle_result.index(k)]<<  f['login']
     end
    end
-   @circle_result.map! {|n|{"name" => n, "imports" => @test['data'][@circle_result.index(n)]}} 
+   @circle_result.map! {|n|{"name" => n, "imports" => @test['data'][@circle_result.index(n)]}}
 end
 
 def aquire_data
    @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
-   @data[@user] = @api.get("/users/#{@user}")      
+   @data[@user] = @api.get("/users/#{@user}")
 end
 
 def filter_data
@@ -47,7 +66,7 @@ def get_data
             t[f['login']]['follower_count'] = 0
             t[f['login']]['followers'] = @api.get("/users/#{f['login']}/followers")
             t[f['login']]['user'] = @api.get("/users/#{f['login']}")
-            
+
           end
         end
       end
@@ -61,7 +80,7 @@ end
 def process_data
   @result['nodes'] = @data.keys
   @result['links'] = []
-  
+
   @data.each do |k,v|
     v['followers'].each do |f|
       @result['links'] << {
@@ -71,12 +90,12 @@ def process_data
       } if @result['nodes'].index(f['login'])
     end
   end
-  
+
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "color" => ""}}
-  
-    #if @lang == 1
+
+  #if @lang == 1
   script_language
-     #end
+  #end
   
 end
 
@@ -84,18 +103,19 @@ def script_language
   origin = 0
   counter = 0
   @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
-  
+
   @result['nodes'].each do |user|
     user_data = @api.users.get(user['name'])
     page = 1
     count = 30
-    user_repos = Array.new 
-    # begin handle repo paging  
+    user_repos = Array.new
+    # begin handle repo paging
     while user_data.public_repos > count do
       page = page +1
       count = count + 30
     end
     # end handle repo paging  
+
     while page >= 1 do
       user_repos[page-1] = @api.repos.list_repos(user['name'], page)
       page = page - 1
@@ -104,7 +124,7 @@ def script_language
     @repos = user_repos
     @j = {}
     start = 0
-    @j["repos"] = [] 
+    @j["repos"] = []
     @j["repo_data"] = []
     @j["language"] = []
     @j["sort"] = {}
@@ -115,10 +135,10 @@ def script_language
       end
     end
     # end preparing to get scriptlanguages of a git user
-    
+
     #remove doubles for comparing languages and count them
     @j["repo_data"] = @j["repos"].uniq
- 
+
     #comparing languages of all repos and count them
     @j["repo_data"].each do |language1|
       @j["repos"].each do |language2|
@@ -139,7 +159,7 @@ def script_language
       end
     else
       @j["max_lang"] << "nothing"
-    end  
+    end
     user['scriptlanguage'] = @j["max_lang"]
   end
   #prepring to get legend for scriptlanguages
@@ -157,7 +177,7 @@ def script_language
      @color[@color.count - 1 + color_adder] = @color[origin]
      color_adder -= 1
      origin += 1
-   end 
+   end
   end
   #get languages, count them and add color to result
   @legend.each do |lang|
@@ -184,27 +204,27 @@ end
 
 get '/follower_viz' do
 
-  @level = 0  
+  @level = 0
 
   @data = {}
-  
+
   @result = {"1" => "1"}
 
   @MAX_LEVELS = params[:level].to_i
 
   @user = params[:user]
-  
+ 
   #@lang = params[:script_language].to_i
-  
+
   @page = 1
   @count = 30
-  @user_repos = Array.new 
-  
+  @user_repos = Array.new
+
   if @user
     aquire_data
     filter_data
     get_data
-    process_data    
+    process_data
     represent
   end
 end
@@ -213,9 +233,9 @@ get '/repo_viz' do
   @user = params[:user]
 
   @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
- 
+
   user_data = @api.users.get(@user)
-  
+
   erb :repo
 end
 
@@ -225,11 +245,11 @@ get '/commit_viz' do
 end
 
 get '/circle_viz' do
-  @level = 0 
+  @level = 0
   @circle_result = {}
   @data = {}
   @user = params[:user]
-  @MAX_LEVELS = 1 
+  @MAX_LEVELS = 1
 if @user
     @api = GitHubV3API.new(ENV['GITHUB_API_KEY'])
     @data[@user] = @api.get("/users/#{@user}")
@@ -239,7 +259,7 @@ if @user
     @data[@user]['user'] = @api.get("/users/#{@user}")
     get_data
     process_circle_data
-    end  
+    end
   erb :circle
 end
 
