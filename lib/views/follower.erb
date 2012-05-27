@@ -1,0 +1,288 @@
+<% if @result.length > 0 then%>
+   <script type="text/javascript">
+   var showOrHide = true;
+      	$(function (){   		
+        	$('.level_form').submit(function(ev){
+          		ev.preventDefault();
+          		$.ajax({
+          			beforeSend: function(){
+          				$('#chart').hide();
+          				$('#desc_text').hide();
+          				$('.ajaxBusy').show();
+          			},
+            		complete: function(){
+            			$('#chart').show();
+            			$('#desc_text').show();
+            			$('.ajaxBusy').hide();
+            		},	
+            		url: "/follower_viz",
+            		data: $(this).serialize(),
+            		dataType: "html",
+            		success: function(data) {
+              			$('#viz').html(data);
+            		}
+         		});
+         	}); 
+         	$('#circle_mode').click(function(ev){
+          		ev.preventDefault();
+		        $.ajax({
+		        	beforeSend: function(){
+          				$('#chart').hide();
+          				$('.ajaxBusy').show();	
+          			},
+            		complete: function(){
+            			$('#chart').show();
+            			$('.ajaxBusy').hide();
+            		},	
+		            url: "/circle_viz",
+		            data: "user="+$("#viz_form input:first").val(),
+		            dataType: "html",
+		            success: function(data) {
+		              $('#chart').html(data);
+		        	}
+          		});
+          		$('#desc_text').empty();
+          		$('#desc_text').append($("<p>network of alters followed by and following ego</p>"));
+      			$('#description').show();
+      			$('form.level_form').hide();
+      			$('#advancedSettings').hide();
+      			$('.show_hide').hide();
+        	});
+        	$('.nodeSwitch').toggle(
+        		function(){
+	   				$('.nodeimage').hide();
+	   				$(this).attr('title', 'OFF');
+           			$(this).text('OFF');
+	  				d3.select("svg").selectAll("a").append("circle") 
+        				.attr("class", "circle")
+        				.attr("r", 5)
+            			.style("fill", function(d) { return d.color;});
+            	            		
+            		var x = <%= @legend.to_json%>;
+                	$.each(x, function(key, value){
+                		$("#advancedSettings").append("<ul><li style='color:" + value["color"] + "'>" + value["lang"] + " : " + value["count"] + "</li></ul>");
+                	});
+	  			},
+	  			function(){
+	   				$("#advancedSettings > ul").remove();
+	   				$('.circle').remove();
+	   				$('.nodeimage').show();
+	   				$(this).attr('title', 'ON');
+           			$(this).text('ON');
+	  			}	
+      		);
+      		
+		    $('#showhide').toggle(
+        		function(){
+	   				$('text.nodetext').animate({opacity: 0}, "slow");
+	   				$(this).attr('title', 'show user name');
+           			$(this).text('show user name');
+	  			},
+	  			function(){
+	   				$('text.nodetext').animate({opacity: 1}, "slow");
+	   				$(this).attr('title', 'hide user name');
+           			$(this).text('hide user name');
+	  			}	
+      		);
+      			 
+        	$('#network_mode').click(function(ev){
+	          	ev.preventDefault();
+	          	
+			    $.ajax({
+			    	beforeSend: function(){
+          				$('#chart').hide();
+          				$('#desc_text').hide();
+          				$('.ajaxBusy').show();
+          			},
+            		complete: function(){
+            			$('#chart').show();
+            			$('#desc_text').show();
+            			$('.ajaxBusy').hide();
+            		},
+			        url: "/follower_viz",
+			        data: $("#viz_form").serialize(),
+			        dataType: "html",
+			        success: function(data) {
+			        	$('#viz').html(data);
+			        }
+	          	});
+        	});
+        });
+   </script>
+   <div class="vis" id="viz">
+   <div class="description" id="desc1">
+    	<div class="level_buttons"> 
+      		<form class="level_form" action="/follower_viz" method="post">
+      			<input name="user" type="hidden" value="<%= @user %>">
+      			<input style="cursor:pointer;" type="submit" value="1 Level">
+      			<input type="hidden" name="level" value="1">
+      		</form>
+      		<form class="level_form" action="/follower_viz" method="post">
+      			<input name="user" type="hidden" value="<%= @user %>">
+      			<input style="cursor:pointer;" type="submit" value="2 Level">
+      			<input type="hidden" name="level" value="2">
+      		</form>
+	      	<div class="mode">
+	    		<a href="#" id ="circle_mode" class="mode">Circle Mode</a>
+	    		<a href="#" id ="network_mode" class="mode">Network Mode</a>
+	    	</div>
+	    	
+	    	<button title="showOrHide" id ="showhide" class="show_hide">hide user name</button>
+	    	<div id="advancedSettings">
+	    		<h3 id="settings">Advanced Settings</h3>
+	    		
+	    		<button title="NodeSwitch" class="nodeSwitch">ON</button>
+	    		<p>Script Language</p>
+	    	</div>
+    	</div>
+    	<div id ="desc_text">
+    		<h3><%= @user%>'s network of <%= @data.keys.length%> followers</h3>
+    		<p>This visualization shows the user's network of followers in 1 level or 2 levels.<br/> 
+    		In the 1st level all gitusers which are directly following <%=@user%> are displayed. <br/> 
+    		In the 2nd level all direct followers of <%=@user%>'s followers are additionally displayed.
+    		</p>
+    	</div>
+   </div>
+   <div style="clear:left;">
+      <div class='gallery' id='chart'> </div>
+   </div>
+   <script src='d3.layout.js?2.7.2' type='text/javascript'></script>
+   <script src='d3.geom.js?2.7.2' type='text/javascript'> </script>
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+   <script type='text/javascript'>
+   $(function (){
+    
+   var w = $(window).width() - 20
+          h = $(window).height() - $("#header").height() -150
+          fill = d3.scale.category20();
+   var vis = d3.select("#chart").append("svg")
+          .attr("width", w)
+          .attr("height", h);
+      
+   var json = <%= @result.to_json %>; 
+	  
+   var force = d3.layout.force()
+            .charge(-200)
+            .linkDistance(30)
+            .nodes(json.nodes)
+            .links(json.links)
+            .size([w, h])
+            .start();	
+    var link = vis.selectAll("line.link")
+            .data(json.links)
+            .enter().append("line")
+            .attr("class", "link")
+            .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+      		.style("stroke","#666666")
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+    var node = vis.selectAll("g.node")
+            .data(json.nodes)
+               .enter().append("svg:g")
+            .on("mouseover", highlight())
+            .on("mouseout", lowlight())
+            .call(force.drag);
+            
+     node.append("svg:a")
+     	.attr("class", "nodelink")
+        .attr('xlink:href', function(d) {return d.profilseite;})
+        .attr('xlink:show', "new");
+     d3.select("svg").selectAll("a").append("svg:image") 
+        .attr("class", "nodeimage")
+        .attr("xlink:href", function(d) { return d.img; })
+        .attr("x", "-9px")
+        .attr("y", "-9px")
+        .attr("width", "18px")
+        .attr("height", "18px");     
+    node.append("svg:text")
+        .attr("class", "nodetext")
+        .attr("dx", 11)
+        .attr("dy", ".75em")
+        .text(function(d) { return d.name });
+    node.append("title")
+        .text(function(d) { return d.name}); 
+    force.on("tick", function() {
+         link.attr("x1", function(d) { return d.source.x; })
+              .attr("y1", function(d) { return d.source.y; })
+              .attr("x2", function(d) { return d.target.x; })
+              .attr("y2", function(d) { return d.target.y; });
+		  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+          //node.attr("x", function(d) { return d.x-12.5; })
+          //.attr("y", function(d) { return d.y-12.5; });
+          //node.attr("cx", function(d) { return d.x; })
+          //.attr("cy", function(d) { return d.y; });
+        });
+      //});
+    function highlight() {
+    	return function(i) {
+    	a = 0;
+    	index = [];
+    	vis.selectAll("line.link")
+        	.filter(function(d) {
+		if (d.source.index == i.index){
+		index[a] = [d.target.index];
+		a += 1;}
+		else if (d.target.index == i.index){
+		index[a] = [d.source.index];
+		a += 1;};
+  		});  		
+  		index.forEach(function(ind){
+	    	vis.selectAll("line")
+				.filter(function(d) {
+					if (d.source.index == ind){
+					return d.source.index == ind & d.target.index == i.index;	
+					} else if (d.target.index == ind){
+					return d.target.index == ind & d.source.index == i.index;
+					};
+					index = [];
+					a = 0;
+				})
+			.style("stroke-width", function(d) { return Math.sqrt(d.value) + 0.75; })
+			.style("stroke", "#af001b")
+			.style("fill", "#af001b");
+     	});
+     	d3.event.stopPropagation();
+      };	
+    };
+    function lowlight() {
+    	return function(i) {
+    	a = 0;
+    	index = [];
+    	vis.selectAll("line.link")
+        	.filter(function(d) {
+		if (d.source.index == i.index){
+		index[a] = [d.target.index];
+		a += 1;}
+		else if (d.target.index == i.index){
+		index[a] = [d.source.index];
+		a += 1;};
+  		});  		
+  		index.forEach(function(ind){
+	    	vis.selectAll("line")
+				.filter(function(d) {
+					if (d.source.index == ind){
+					return d.source.index == ind & d.target.index == i.index;	
+					} else if (d.target.index == ind){
+					return d.target.index == ind & d.source.index == i.index;
+					};
+					index = [];
+					a = 0;
+				})
+			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
+			.style("stroke", "#666666")
+			.style("fill", "#666666");
+     	});
+     	d3.event.stopPropagation();
+    	};	
+    };
+    });
+    </script>
+    <%end %>
+    <div class="ajaxBusy">
+    	<br/>
+    	<p>Loading</p>
+    	<p><img src="picz/ajax-loader.gif" alt="...it's loading..."></p>
+    </div>
+</div> 
