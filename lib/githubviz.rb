@@ -19,8 +19,8 @@ class ApiConnection
   def get url, paging=false
     if paging
       result = []
-      (paging / 30).ceil.times do |page|
-        result += @connection.get "#{url}?page=#{page}"
+      (paging / 30.0).ceil.times do |page|
+        result += @connection.get "#{url}?page=#{page+1}"
       end
     else
       @connection.get url
@@ -105,7 +105,15 @@ def process_data
     end
   end
 
-  @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "color" => ""}}
+  @result['nodes'].map!{|n| {
+    "name" => n,
+    "group" => 1,
+    "img" => @data[n]['avatar_url'],
+    "profilseite" => @data[n]['user']['html_url'],
+    "follower_count" => @data[n]['follower_count'],
+    "color" => "",
+    "public_repos" => @data[n]['user']['public_repos']
+  }}
 
   script_language
 
@@ -117,46 +125,34 @@ def script_language
   @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
 
   @result['nodes'].each do |user|
-    #begin preparing to get repo languages of a git user
     @repos = @@api.get("/users/#{user['name']}/repos", user['public_repos'])
-    @j = {}
-    start = 0
-    @j["repos"] = []
-    @j["repo_data"] = []
-    @j["language"] = []
-    @j["sort"] = {}
-    @j["max_lang"]=[]
-    @repos.each do |repo|
-        @j["repos"] << {"language"=>repo['language'],"count" => 0}
-    end
-    # end preparing to get scriptlanguages of a git user
-
-    #remove doubles for comparing languages and count them
-    @j["repo_data"] = @j["repos"].uniq
-
-    #comparing languages of all repos and count them
-    @j["repo_data"].each do |language1|
-      @j["repos"].each do |language2|
-        if language1["language"] == language2["language"] then
-          language1["count"] += 1
-        end
-      end
-      @j["sort"].store(language1["language"], language1["count"])
-    end
-    #sort descending by language counts
-    @sort = @j["sort"].sort_by {|key, value| -value}
-    #compare languages (langauage or no language?) and add scriptlanguage to result
-    unless @sort.empty?
-      @sort.each do |scriptlanguage|
-        if scriptlanguage[1] == @sort[0][1] then
-          @j["max_lang"] << scriptlanguage[0]
-        end
-      end
+    languages = {}
+    if @repos.count == 0
+      user['scriptlanguage'] = 'nothing'
     else
-      @j["max_lang"] << "nothing"
+      @repos.each do |repo|
+        if languages.has_key? repo['language']
+          languages[repo['language']] += 1
+        else
+          languages[repo['language']] = 1
+        end
+      end
+
+      most_used_languages = {}
+      languages.each do |lang_name, lang_count|
+        if most_used_languages.has_key? lang_count
+          most_used_languages[lang_count] << lang_name
+        else
+          most_used_languages[lang_count] = [lang_name]
+        end
+      end
+      #{12 => ["Ruby", "C++"], 5 => ["Javascript"], 3 => ['HTML', 'CSS']}
+
+      user['scriptlanguage'] = most_used_languages.sort {|a,b| b[0] <=> a[0]}[0][1]
+      #['C++', 'Ruby']
     end
-    user['scriptlanguage'] = @j["max_lang"]
   end
+
   #prepring to get legend for scriptlanguages
   @scriptlanguage_legend = []
   @result['nodes'].each do |user|
