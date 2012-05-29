@@ -60,7 +60,11 @@ class GitHubV3API
         GitHubV3API::Repo.new(self, repo_data)
       end
     end
-
+    # Returns an array of GitHubV3API::Repo instance containing the repositories 
+    # for the specified +user+ and +page+.
+    #
+    # +user+:: the string ID of the user, e.g. "octocat"
+    # +page+:: the int for the page of the repo list, e.g. "1" for repo 1 - 30 (each page includes max 30 repos)
     def list_repos(user, page)
       @connection.get("/users/#{user}/repos?page=#{page}").map do |repo_data|
       GitHubV3API::Repo.new(self, repo_data)

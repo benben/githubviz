@@ -20,14 +20,6 @@ class ApiConnection
     @connection.get url
   end
 
-  def users url
-    @connection.users.get url
-  end
-
-  def repos url, page
-    @connection.repos.list_repos url, page
-  end
-
   NoApiKeyError = Class.new(StandardError)
 end
 
@@ -82,7 +74,6 @@ def get_data
             t[f['login']]['follower_count'] = 0
             t[f['login']]['followers'] = @@api.get("/users/#{f['login']}/followers")
             t[f['login']]['user'] = @@api.get("/users/#{f['login']}")
-
           end
         end
       end
@@ -109,9 +100,7 @@ def process_data
 
   @result['nodes'].map!{|n| {"name" => n, "group" => 1, "img" => @data[n]['avatar_url'], "profilseite" => @data[n]['user']['html_url'], "follower_count" => @data[n]['follower_count'], "color" => ""}}
 
-  #if @lang == 1
   script_language
-  #end
 
 end
 
@@ -121,21 +110,22 @@ def script_language
   @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
 
   @result['nodes'].each do |user|
-    user_data = @@api.users(user['name'])
+    user_data = @@api.get("/users/#{user['name']}")
     page = 1
     count = 30
     user_repos = Array.new
     # begin handle repo paging
-    while user_data.public_repos > count do
+    while user_data["public_repos"] > count do
       page = page +1
       count = count + 30
     end
     # end handle repo paging
-
+    # begin list paged repos
     while page >= 1 do
-      user_repos[page-1] = @@api.repos(user['name'], page)
+      user_repos[page-1] = @@api.get("/users/#{user['name']}/repos?page=#{page}")
       page = page - 1
     end
+    # end list paged repos
     #begin preparing to get repo languages of a git user
     @repos = user_repos
     @j = {}
@@ -147,7 +137,7 @@ def script_language
     @j["max_lang"]=[]
     @repos.each do |page|
       page.each do |repo|
-        @j["repos"] << {"language"=>repo.language,"count" => 0}
+        @j["repos"] << {"language"=>repo['language'],"count" => 0}
       end
     end
     # end preparing to get scriptlanguages of a git user
@@ -230,10 +220,6 @@ get '/follower_viz' do
 
   @user = params[:user]
 
-  #@lang = params[:script_language].to_i
-
-  @page = 1
-  @count = 30
   @user_repos = Array.new
 
   if @user
