@@ -16,8 +16,15 @@ class ApiConnection
     @connection = GitHubV3API.new(api_key)
   end
 
-  def get url
-    @connection.get url
+  def get url, paging=false
+    if paging
+      result = []
+      (paging / 30).ceil.times do |page|
+        result += @connection.get "#{url}?page=#{page}"
+      end
+    else
+      @connection.get url
+    end
   end
 
   NoApiKeyError = Class.new(StandardError)
@@ -110,24 +117,8 @@ def script_language
   @color = ["#FF0000", "#FF8000", "#FFFF00", "#80FF00", "#00FF80", "#00FFFF", "#0080FF", "#0000FF", "#8000FF", "#FF00FF", "#FF0080", "#000000", "#A9A9A9", "#800000", "#804000", "#808000", "#008040", "#008080", "#004080", "#800060" ]
 
   @result['nodes'].each do |user|
-    user_data = @@api.get("/users/#{user['name']}")
-    page = 1
-    count = 30
-    user_repos = Array.new
-    # begin handle repo paging
-    while user_data["public_repos"] > count do
-      page = page +1
-      count = count + 30
-    end
-    # end handle repo paging
-    # begin list paged repos
-    while page >= 1 do
-      user_repos[page-1] = @@api.get("/users/#{user['name']}/repos?page=#{page}")
-      page = page - 1
-    end
-    # end list paged repos
     #begin preparing to get repo languages of a git user
-    @repos = user_repos
+    @repos = @@api.get("/users/#{user['name']}/repos", user['public_repos'])
     @j = {}
     start = 0
     @j["repos"] = []
@@ -135,10 +126,8 @@ def script_language
     @j["language"] = []
     @j["sort"] = {}
     @j["max_lang"]=[]
-    @repos.each do |page|
-      page.each do |repo|
+    @repos.each do |repo|
         @j["repos"] << {"language"=>repo['language'],"count" => 0}
-      end
     end
     # end preparing to get scriptlanguages of a git user
 
