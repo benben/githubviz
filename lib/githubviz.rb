@@ -234,7 +234,7 @@ end
 get '/repo_viz' do
   @user = params[:user]
 
-  user_data = @@api.users(@user)
+  user_data = @@api.get("/users/#{@user}")
 
   erb :repo
 end
