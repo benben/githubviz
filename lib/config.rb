@@ -9,8 +9,10 @@ else
 end
 
 begin
+  require 'yaml'
   @@config = YAML.load_file('database.yml')[env]
 rescue
+  require 'uri'
   db = URI.parse(ENV['DATABASE_URL'])
 
   @@config = {

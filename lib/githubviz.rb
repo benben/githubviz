@@ -17,14 +17,30 @@ class ApiConnection
   end
 
   def get url, paging=false
-    if paging
-      result = []
-      (paging / 30.0).ceil.times do |page|
-        result += @connection.get "#{url}?page=#{page+1}"
-      end
+    name = url.match(/^\/users\/([^\/]+)\/*/)[1]
+    type = url[/[^\/]+$/]
+    type = "user" unless %w[repos followers].include? type
+
+    req = Request.where("name = ? AND content_type = ? AND updated_at > ?", name, type, Time.now - 1.week).limit(1)[0]
+
+    result = []
+
+    if req
+      result = JSON.parse(req.content)
     else
-      @connection.get url
+      puts "doing an api request..."
+      if paging
+        (paging / 30.0).ceil.times do |page|
+          result += @connection.get "#{url}?page=#{page+1}"
+        end
+      else
+        result = @connection.get url
+      end
+
+      Request.create!(:name => name, :content_type => type, :content => result.to_json)
     end
+
+    result
   end
 
   NoApiKeyError = Class.new(StandardError)

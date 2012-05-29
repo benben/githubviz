@@ -8,13 +8,13 @@ require 'active_record'
 namespace :db do
   desc "create your database"
   task :create do
-    if config['adapter'] =~ /sqlite/
-      if File.exist?(config['database'])
-        $stderr.puts "#{config['database']} already exists"
+    if @@config['adapter'] =~ /sqlite/
+      if File.exist?(@@config['database'])
+        $stderr.puts "#{@@config['database']} already exists"
       else
         begin
           # Create the SQLite database
-          ActiveRecord::Base.establish_connection(config)
+          ActiveRecord::Base.establish_connection(@@config)
           ActiveRecord::Base.connection
         rescue Exception => e
           $stderr.puts e, *(e.backtrace)
@@ -24,15 +24,15 @@ namespace :db do
     else
       @charset   = ENV['CHARSET']   || 'utf8'
       @collation = ENV['COLLATION'] || 'utf8_unicode_ci'
-      creation_options = {:charset => (config['charset'] || @charset), :collation => (config['collation'] || @collation)}
+      creation_options = {:charset => (@@config['charset'] || @charset), :collation => (@@config['collation'] || @collation)}
       ActiveRecord::Base.establish_connection(config.merge('database' => nil))
-      ActiveRecord::Base.connection.create_database(config['database'], creation_options)
+      ActiveRecord::Base.connection.create_database(@@config['database'], creation_options)
     end
   end
 
   desc "migrate your database"
   task :migrate do
-    ActiveRecord::Base.establish_connection(config)
+    ActiveRecord::Base.establish_connection(@@config)
     ActiveRecord::Migrator.migrate(
       'db/migrate',
       ENV["VERSION"] ? ENV["VERSION"].to_i : nil
@@ -47,14 +47,14 @@ namespace :db do
   desc 'Drops the database'
   task :drop do
     begin
-      if config['adapter'] =~ /sqlite/
-        FileUtils.rm(config['database'])
+      if @@config['adapter'] =~ /sqlite/
+        FileUtils.rm(@@config['database'])
       else
-        ActiveRecord::Base.establish_connection(config)
-        ActiveRecord::Base.connection.drop_database config['database']
+        ActiveRecord::Base.establish_connection(@@config)
+        ActiveRecord::Base.connection.drop_database @@config['database']
       end
     rescue Exception => e
-      $stderr.puts "Couldn't drop #{config['database']} : #{e.inspect}"
+      $stderr.puts "Couldn't drop #{@@config['database']} : #{e.inspect}"
     end
   end
 
@@ -65,7 +65,7 @@ namespace :db do
   task :up do
     version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
     raise "VERSION is required" unless version
-    ActiveRecord::Base.establish_connection(config)
+    ActiveRecord::Base.establish_connection(@@config)
     ActiveRecord::Migrator.run(:up, "db/migrate/", version)
 
     require 'active_record/schema_dumper'
@@ -78,7 +78,7 @@ namespace :db do
   task :down do
     version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
     raise "VERSION is required" unless version
-    ActiveRecord::Base.establish_connection(config)
+    ActiveRecord::Base.establish_connection(@@config)
     ActiveRecord::Migrator.run(:down, "db/migrate/", version)
 
     require 'active_record/schema_dumper'
@@ -91,7 +91,7 @@ namespace :db do
   task :seed do
     seed_file = ENV["file"] ? ENV["file"].to_s : File.join('db', 'seeds.rb')
     if File.exist?(seed_file)
-      ActiveRecord::Base.establish_connection(config)
+      ActiveRecord::Base.establish_connection(@@config)
       require 'lib/models'
       begin
       require seed_file
