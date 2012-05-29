@@ -132,4 +132,13 @@ end
 EOS
     end
   end
+
+  desc 'Delete all database content'
+  task :trunc do
+    ActiveRecord::Base.establish_connection(@@config)
+    require 'lib/githubviz'
+    Request.all.each do |r|
+      r.destroy
+    end
+  end
 end
